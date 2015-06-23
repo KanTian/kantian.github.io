@@ -2,6 +2,6 @@
 Hi, this is my personal blog, you can view it throw [kantian.github.io](http://kantian.github.io) OR [fengcode.com](www.fengcode.com)
 
 ###Thanks
-[Github](https://pages.github.com/)
-[Hexo](https://hexo.io/)
+- [Github](https://pages.github.com/)
+- [Hexo](https://hexo.io/)
 
