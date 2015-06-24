@@ -1,0 +1,701 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.3"/>
+
+
+    <meta name="description" content="技术是一场修行..." />
+
+
+
+  <meta name="keywords" content="Linux," />
+
+
+
+  <link rel="alternate" href="/atom.xml" title="kantian's Notes" type="application/atom+xml" />
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.3" />
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    analytics: {
+      google: ''
+    },
+    sidebar: 'hide'
+  };
+</script>
+
+
+
+
+  <title> 浅谈大端模式和小端模式 // kantian's Notes </title>
+</head>
+
+<body>
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand">
+      <span class="logo">
+        <i class="icon-logo"></i>
+      </span>
+      <span class="site-title">kantian's Notes</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<div class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            <i class="menu-item-icon icon-archives"></i> <br />
+            文章列表
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            <i class="menu-item-icon icon-categories"></i> <br />
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            <i class="menu-item-icon icon-about"></i> <br />
+            关于
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+</div>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              浅谈大端模式和小端模式
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2015-03-05
+        </span>
+
+        
+          <span class="post-category">
+            &nbsp; | &nbsp; 分类于
+            
+              <a href="/categories/Linux/">Linux</a>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2015/03/05/big-endian-and-little-endian/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2015/03/05/big-endian-and-little-endian/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <h2 id="简介">简介</h2><p>计算机内存中，数据是按照字节进行存储，对应于内存中的每一个字节都有一个地址。如果我们内存想象成一个无比庞大的数组，那么这个数组包含若干个元素，我们通过地址来访问数组中的每一个元素。每一个数组元素占一个字节大小并且存放一个字接大小的内容。</p>
+<h2 id="数据在内存中的存放">数据在内存中的存放</h2><p>以32位为例，通常的int型和float型数据都占用32位（bits），也就是4字节（bytes）。每一个内存地址指向的内存单元只能存放1字节(8-bits)，<strong>因此需要把一个占4字节的一个int型数据拆分，存放到4个连续的内存单元中</strong>。比方说,有一个占32位的int型数据(十六进制表示）： k = 0x12345678，拆分后每一个字节对应的部分数据为12,34,56,78。由于<a href="http://en.wikipedia.org/wiki/Endianness#History" target="_blank" rel="external">历史的原因</a>，存在两种不同的字节顺序(endianness)来存放这4个字节——大端字节序（Big-endian）和小端字节序（Little-endian），其在内存中的存放顺序大致分别如下图所示：</p>
+<h4 id="大端字节序(Big-endian)">大端字节序(Big-endian)</h4><table>
+<thead>
+<tr>
+<th>地址</th>
+<th>数据  </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P</td>
+<td>12</td>
+</tr>
+<tr>
+<td>P+1</td>
+<td>34</td>
+</tr>
+<tr>
+<td>P+2</td>
+<td>56</td>
+</tr>
+<tr>
+<td>P+3</td>
+<td>78</td>
+</tr>
+</tbody>
+</table>
+<h4 id="小端字节序(Little-endian)">小端字节序(Little-endian)</h4><table>
+<thead>
+<tr>
+<th>地址</th>
+<th>数据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P</td>
+<td>78</td>
+</tr>
+<tr>
+<td>P+1</td>
+<td>56</td>
+</tr>
+<tr>
+<td>P+2</td>
+<td>34</td>
+</tr>
+<tr>
+<td>P+3</td>
+<td>12</td>
+</tr>
+</tbody>
+</table>
+<p><strong>字节序</strong>是一个处理器架构特性，用来指示超过单个字节大小的数据类型（如：int,float,double，etc…)在内存中存储的字节顺序。<br>以上两种字节序的存放顺序是恰好相反的。注意，为了方便记忆，可以理解为：</p>
+<blockquote>
+<pre><code>大端字节序：  <span class="keyword">*</span>低地址存放数字<span class="keyword">*</span><span class="keyword">*</span>高<span class="keyword">*</span><span class="keyword">*</span>位<span class="keyword">*</span>
+小端字节序：  <span class="keyword">*</span>低地址存放数字<span class="keyword">*</span><span class="keyword">*</span>低<span class="keyword">*</span><span class="keyword">*</span>位<span class="keyword">*</span>
+</code></pre></blockquote>
+<h4 id="常见几个系统的字节序">常见几个系统的字节序</h4><table>
+<thead>
+<tr>
+<th>操作系统</th>
+<th>处理器架构</th>
+<th>字节序</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FreeBSD 5.2.1</td>
+<td>Intel Pentium</td>
+<td>Little-endian</td>
+</tr>
+<tr>
+<td>Linux 2.4.22</td>
+<td>Intel Pentium</td>
+<td>Little-endian</td>
+</tr>
+<tr>
+<td>Mac Ox X 10.3</td>
+<td>PowerPC</td>
+<td>Big-endian</td>
+</tr>
+<tr>
+<td>Solaris 9</td>
+<td>Sun SPARC</td>
+<td>Big-endian</td>
+</tr>
+</tbody>
+</table>
+<h2 id="字节序与编程">字节序与编程</h2><p>通常来说，在同一台计算机上的进程进行通信时，不必考虑字节序。然而在不同计算机之间进行数据传输和存储的时候就必然要考虑不同的计算机的字节序差异了，否则会带来意想不到的结果。<br>不妨看看如下代码：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">#<span class="keyword">include</span> &lt;stdio.h&gt;</span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">include</span> &lt;string.h&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span> <span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span>* argv[])</span> </span>&#123;</span><br><span class="line">    FILE* fp;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Our example data structure */</span></span><br><span class="line">    <span class="keyword">struct</span> &#123;</span><br><span class="line">        <span class="keyword">char</span> one[<span class="number">4</span>];</span><br><span class="line">        <span class="keyword">int</span>  two;</span><br><span class="line">        <span class="keyword">char</span> three[<span class="number">4</span>];</span><br><span class="line">    &#125; data;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Fill our structure with data */</span></span><br><span class="line">    <span class="built_in">strcpy</span> (data.one, <span class="string">"foo"</span>);</span><br><span class="line">    data.two = <span class="number">0x01234567</span>;</span><br><span class="line">    <span class="built_in">strcpy</span> (data.three, <span class="string">"bar"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Write it to a file */</span></span><br><span class="line">    fp = fopen (<span class="string">"output"</span>, <span class="string">"wb"</span>);</span><br><span class="line">    <span class="keyword">if</span> (fp) &#123;</span><br><span class="line">        fwrite (&amp;data, <span class="keyword">sizeof</span> (data), <span class="number">1</span>, fp);</span><br><span class="line">        fclose (fp);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这段代码把一个结构体data写入到文件output当中。这个结构体包含一个char类型数组（one），一个int型数（two），以及另一个char类型数组（three）。<br>不论在大端字节序还是在小端字节序的机子上都能正常编译和运行，然而当我们通过hexdump工具查看程序输出文件内容的时候，差别就显现出来了。</p>
+<ul>
+<li><p>在大端字节序（Big-endian）机子下：</p>
+<figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">00000000</span>  66 6f 6f <span class="number">00 12 34 56</span> 78  <span class="number">62 61 72 00</span>     |foo..4Vxbar.|</span><br><span class="line"><span class="number">0000000</span>c</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在小端字节序（Little-endian）机子下：</p>
+<figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">00000000</span>  66 6f 6f <span class="number">00 78 56 34</span> 12  <span class="number">62 61 72 00</span>     |foo.xV4.bar.|</span><br><span class="line"><span class="number">0000000</span>c</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>可见，在不同的平台上面，对结构体中int类型的数two的存储顺序是不同的。如果处理器只按照各自默然的方式来读取文件的话，文件的内容就并非我们所想象的那样了。</p>
+<h4 id="判断机器字节序">判断机器字节序</h4><p>那么,如何通过程序来判断某台机子的字节序呢？且看如下代码：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">#<span class="keyword">include</span> &lt;stdio.h&gt;</span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">include</span> &lt;stdlib.h&gt;</span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">include</span> &lt;inttypes.h&gt;</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">uint32_t</span> i;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> *ch;</span><br><span class="line">    i = <span class="number">0x04050607</span>;</span><br><span class="line">    ch = (<span class="keyword">unsigned</span> <span class="keyword">char</span> *)&amp;i;</span><br><span class="line">    <span class="keyword">if</span>(*ch == <span class="number">4</span>)&#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"big endian\n"</span>);</span><br><span class="line">    &#125;<span class="keyword">else</span> <span class="keyword">if</span>(*ch == <span class="number">7</span>)&#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"little endian\n"</span>);</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"unknow\n"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>根据前文的描述不难理解：只要判断其指针所指的第一个字节的内容即可判定是大端字节序还是小端字节序。<br>1）如果第一个字节（低地址）存放的是整数的低位数字，则为小端字节序（Little-endian)<br>2)如果第一个字节（低地址）存放的是整数的高位数字，则为大端字节序（Big-endian）</p>
+<p><strong><em>更进一步，通过宏定义来实现：</em></strong><br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> i = <span class="number">1</span>;</span><br><span class="line"><span class="preprocessor">#<span class="keyword">define</span> is_big_endian() ((*(unsigned char *)&amp;i)==0)</span></span><br></pre></td></tr></table></figure></p>
+<h4 id="字节序转换">字节序转换</h4><p>如何把一个int型数转换为大端字节序呢？<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*System Env:Linux version 3.13.0-43-generic (buildd@akateko) (gcc version 4.6.3 (Ubuntu/Linaro 4.6.3-1ubuntu5) )</span><br><span class="line">  Author: kantian</span><br><span class="line">  Date: 2015-01-06 17:01</span><br><span class="line">  Description:Litter-endian int ---&gt; Big-endian int </span><br><span class="line">*/</span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">include</span> &lt;stdio.h&gt;</span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">include</span> &lt;stdlib.h&gt;</span></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> i = <span class="number">1</span>;</span><br><span class="line"><span class="preprocessor">#<span class="keyword">define</span> is_big_endian() ((*(unsigned char*)&amp;i) == 0)</span></span><br><span class="line"><span class="comment">//方法一:</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">big_endian_int</span><span class="params">(<span class="keyword">int</span> i)</span></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> a,b,c,d;</span><br><span class="line">    <span class="comment">//alread is big-endian,just return i</span></span><br><span class="line">    <span class="keyword">if</span>(is_big_endian())&#123;</span><br><span class="line">        <span class="keyword">return</span> i;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//get the 1st,2nd,3rd and 4th byte</span></span><br><span class="line">    a = i &amp; <span class="number">255</span>;</span><br><span class="line">    b = (i &gt;&gt; <span class="number">8</span>) &amp; <span class="number">255</span>;</span><br><span class="line">    c = (i &gt;&gt; <span class="number">16</span>) &amp; <span class="number">255</span>;</span><br><span class="line">    d = (i &gt;&gt; <span class="number">24</span>) &amp; <span class="number">255</span>;</span><br><span class="line">    <span class="comment">//combine them in new order</span></span><br><span class="line">    <span class="keyword">return</span> (<span class="keyword">int</span>)((<span class="keyword">int</span>)d + (<span class="keyword">int</span>)(c &lt;&lt; <span class="number">8</span>) + (<span class="keyword">int</span>)(b &lt;&lt;<span class="number">16</span>) + (<span class="keyword">int</span>)(a &lt;&lt; <span class="number">24</span>));</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//方法二:</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">big_endian_int_2</span><span class="params">(<span class="keyword">char</span> *i)</span></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> a;    </span><br><span class="line">    <span class="keyword">char</span> *b = (<span class="keyword">char</span> *)&amp;a;</span><br><span class="line">    <span class="comment">//for each byte</span></span><br><span class="line">    <span class="keyword">if</span>(is_big_endian())&#123;</span><br><span class="line">       b[<span class="number">0</span>] = i[<span class="number">0</span>];</span><br><span class="line">       b[<span class="number">1</span>] = i[<span class="number">1</span>];</span><br><span class="line">       b[<span class="number">2</span>] = i[<span class="number">2</span>];</span><br><span class="line">       b[<span class="number">3</span>] = i[<span class="number">3</span>];</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">       b[<span class="number">0</span>] = i[<span class="number">3</span>];</span><br><span class="line">       b[<span class="number">1</span>] = i[<span class="number">2</span>];</span><br><span class="line">       b[<span class="number">2</span>] = i[<span class="number">1</span>];</span><br><span class="line">       b[<span class="number">3</span>] = i[<span class="number">0</span>];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> a;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> k = <span class="number">0x01020304</span>;    </span><br><span class="line">    <span class="keyword">int</span> b = big_endian_int(k);</span><br><span class="line">    <span class="keyword">int</span> c = big_endian_int_2((<span class="keyword">char</span> *)&amp;k);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"%x\n"</span>,b);<span class="comment">//04030201</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"%x\n"</span>,c);<span class="comment">//04030201</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="网络和主机间字节序交换">网络和主机间字节序交换</h4><p>如前文所述，不同的计算机进程之间通过网络进行通信的时候，不同的字节序会给其带来麻烦。那么如何来消除不同计算机之间字节序的不同所造成的影响呢？事实上网络协议通常规定了字节序，因此，异构计算机系统能够交换协议信息而不会混淆字节序，如TCP/IP协议就是大端字节序（Big-endian)。对于TCP/IP应用程序，提供了四个通用的程序用来进行本地字节序跟网络字节序之间的转换，如下所示：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">#<span class="keyword">include</span> &lt;arpa/inet.h&gt;</span></span><br><span class="line"><span class="comment">//将主机字节序转换为32位网络字节序</span></span><br><span class="line"><span class="keyword">uint32_t</span> htonl(<span class="keyword">uint32_t</span> hostint32);</span><br><span class="line"></span><br><span class="line"><span class="comment">//将主机字节序转换微16位网络字节序</span></span><br><span class="line"><span class="keyword">uint16_t</span> htons(<span class="keyword">uint16_t</span> hostint16);</span><br><span class="line"></span><br><span class="line"><span class="comment">//将网络字节序转换为32位主机字节序</span></span><br><span class="line"><span class="keyword">uint32_t</span> ntohl(<span class="keyword">uint32_t</span> hostint32);</span><br><span class="line"></span><br><span class="line"><span class="comment">//将网络字节序转换微16位主机字节序</span></span><br><span class="line"><span class="keyword">uint16_t</span> ntohs(<span class="keyword">uint16_t</span> hostint16);</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<pre><code>注意，便于记忆：
+<span class="string">n:</span>  network 网络
+h： host 主机
+<span class="string">l:</span>  <span class="typename">long</span> 整型（<span class="number">4</span> bytes) 相对于<span class="typename">short</span>
+s： <span class="typename">short</span> 短整型（<span class="number">2</span> bytes) 
+</code></pre></blockquote>
+<h2 id="问题来了">问题来了</h2><p>下面程序在大端字节序（Big-endian)的机子上和小端字节序(Little-endian)的机子上分别输出什么？<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">#<span class="keyword">include</span> &lt;stdlib.h&gt;</span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">include</span> &lt;stdio.h&gt;</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> endian[<span class="number">2</span>] = &#123;<span class="number">1</span>,<span class="number">0</span>&#125;;</span><br><span class="line">    <span class="keyword">short</span> x;</span><br><span class="line">    x = *(<span class="keyword">short</span> *) endian;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"%d\n"</span>,x);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>答案是：</p>
+<blockquote>
+<pre><code><span class="attribute">Little-endian</span>: <span class="string"> 1</span>
+<span class="attribute">Big-endian</span>: <span class="string"> 256</span>
+</code></pre></blockquote>
+<h2 id="参考文献"> 参考文献</h2><ul>
+<li>[1] <a href="http://en.wikipedia.org/w/index.php?title=Endianness" target="_blank" rel="external">http://en.wikipedia.org/w/index.php?title=Endianness</a></li>
+<li>[2] <a href="http://www.ibm.com/developerworks/aix/library/au-endianc/index.html" target="_blank" rel="external">http://www.ibm.com/developerworks/aix/library/au-endianc/index.html</a></li>
+<li>[3] <a href="http://www.apuebook.com/apue2e.html" target="_blank" rel="external">http://www.apuebook.com/apue2e.html</a></li>
+</ul>
+
+      
+    </div>
+
+    <div class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux/"> #Linux </a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/06/24/hello-world/">Hello World</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/02/01/mysql-crash-course-3/">MySQL 知识点整理三</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </div>
+  </div>
+
+
+
+    
+
+    
+      <div class="comments" id="comments">
+        
+          <div class="ds-thread" data-thread-key="2015/03/05/big-endian-and-little-endian/"
+               data-title="浅谈大端模式和小端模式" data-url="http://fengcode.com/2015/03/05/big-endian-and-little-endian/">
+          </div>
+        
+      </div>
+    
+  </div>
+
+
+        </div>
+
+        
+      </div>
+
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview">
+        <div class="site-author motion-element">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="KanTian" />
+          <p class="site-author-name">KanTian</p>
+        </div>
+        <p class="site-description motion-element">技术是一场修行...</p>
+        <div class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">5</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">2</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            
+              <span class="site-state-item-count">2</span>
+              <span class="site-state-item-name">标签</span>
+              
+          </div>
+
+        </div>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml">
+              <i class="menu-item-icon icon-feed"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+              <a href="https://github.com/kantian" target="_blank">github</a>
+            </span>
+            
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element">
+            <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+      </div>
+
+      
+        <div class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#简介"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据在内存中的存放"><span class="nav-number">2.</span> <span class="nav-text">数据在内存中的存放</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#大端字节序(Big-endian)"><span class="nav-number">2.0.1.</span> <span class="nav-text">大端字节序(Big-endian)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#小端字节序(Little-endian)"><span class="nav-number">2.0.2.</span> <span class="nav-text">小端字节序(Little-endian)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#常见几个系统的字节序"><span class="nav-number">2.0.3.</span> <span class="nav-text">常见几个系统的字节序</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#字节序与编程"><span class="nav-number">3.</span> <span class="nav-text">字节序与编程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#判断机器字节序"><span class="nav-number">3.0.1.</span> <span class="nav-text">判断机器字节序</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#字节序转换"><span class="nav-number">3.0.2.</span> <span class="nav-text">字节序转换</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#网络和主机间字节序交换"><span class="nav-number">3.0.3.</span> <span class="nav-text">网络和主机间字节序交换</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#问题来了"><span class="nav-number">4.</span> <span class="nav-text">问题来了</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考文献"><span class="nav-number">5.</span> <span class="nav-text"> 参考文献</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </div>
+      
+
+    </div>
+  </div>
+
+
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp; 
+  2015
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">KanTian</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.3"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.3"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.3" id="motion.global"></script>
+
+
+
+  <script type="text/javascript" src="/js/search-toggle.js"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.3" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+      var $tocContent = $('.post-toc-content');
+      if (isDesktop() && CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    });
+  </script>
+
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"kantian"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+
+
+  
+  
+
+</body>
+</html>

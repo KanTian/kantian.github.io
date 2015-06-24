@@ -1,0 +1,785 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.3"/>
+
+
+    <meta name="description" content="技术是一场修行..." />
+
+
+
+  <meta name="keywords" content="MySQL," />
+
+
+
+  <link rel="alternate" href="/atom.xml" title="kantian's Notes" type="application/atom+xml" />
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.3" />
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    analytics: {
+      google: ''
+    },
+    sidebar: 'hide'
+  };
+</script>
+
+
+
+
+  <title> MySQL 知识点整理三 // kantian's Notes </title>
+</head>
+
+<body>
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand">
+      <span class="logo">
+        <i class="icon-logo"></i>
+      </span>
+      <span class="site-title">kantian's Notes</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<div class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            <i class="menu-item-icon icon-archives"></i> <br />
+            文章列表
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            <i class="menu-item-icon icon-categories"></i> <br />
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            <i class="menu-item-icon icon-about"></i> <br />
+            关于
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+</div>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              MySQL 知识点整理三
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2015-02-01
+        </span>
+
+        
+          <span class="post-category">
+            &nbsp; | &nbsp; 分类于
+            
+              <a href="/categories/MySQL/">MySQL</a>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2015/02/01/mysql-crash-course-3/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2015/02/01/mysql-crash-course-3/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <h2 id="概述">概述</h2><p>本文接上文<a href="/blog/2015/01/14/mysql-crash-course-1/">MySQL 知识点整理(上)</a>,<a href="/blog/2015/01/14/mysql-crash-course-2/">MySQL 知识点整理(中)</a>.<br>该部分主要梳理了MySQL的视图、存储过程、游标、触发器以及事务处理等。</p>
+<h2 id="视图">视图</h2><h4 id="视图简介">视图简介</h4><p>视图是虚拟的表。与包含数据的表不一样，视图只包含使用是动态检索数据的查询。<br>为什么使用视图：</p>
+<ul>
+<li>简化并且重用SQL语句,一次性编写基础SQL语句</li>
+<li>封装内部表结构，保护数据</li>
+<li>…</li>
+</ul>
+<p>视图本身不包含数据，在针对视图进行SELECT的操作时，或者对多个视图进行联结时，都会执行视图所封装的查询。<br>因此如果用多个联结和过滤创建了一个复杂的视图时，可能会发现性能大幅下降。</p>
+<h4 id="视图的规则和限制">视图的规则和限制</h4><ul>
+<li>视图名字唯一</li>
+<li>可创建的视图数目没有限制</li>
+<li>创建视图需要获取权限</li>
+<li>视图可以嵌套</li>
+<li>对视图进行SELECT时，如果用到了ORDER BY，那么会覆盖视图内部SELECT中的ORDER BY</li>
+<li>视图可以和表一起使用</li>
+</ul>
+<hr>
+<h4 id="创建视图">创建视图</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CREATE VIEW productcustomers AS&#10;SELECT cust_name, cust_contact, prod_id&#10;FROM customers, orders, orderitems&#10;WHERE customers.cust_id = orders.cust_id&#10;    AND orderitems.order_num = orders.order_num;</span><br></pre></td></tr></table></figure>
+<h4 id="查看视图创建语句">查看视图创建语句</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SHOW CREATE VIEW productcustomers;</span><br></pre></td></tr></table></figure>
+<h4 id="删除视图">删除视图</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">DROP VIEW productcustomers;</span><br></pre></td></tr></table></figure>
+<h4 id="修改视图">修改视图</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1.&#10;DROP VIEW viewname;&#10;CREATE VIEW ...&#10;&#10;2.&#10;CREATE OR REPLACE VIEW ...</span><br></pre></td></tr></table></figure>
+<h4 id="利用视图进行查询">利用视图进行查询</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT cust_name, cust_contact&#10;FROM productcustomers&#10;WHERE prod_id = &#39;TNT2&#39;;</span><br></pre></td></tr></table></figure>
+<h4 id="创建视图，重新格式化查询数据">创建视图，重新格式化查询数据</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CREATE VIEW vendorlocation AS&#10;SELECT Concat(RTrim(vend_name),&#39; (&#39;, RTrim(vend_country),&#39;)&#39;)&#10;    AS vend_title&#10;FROM vendors&#10;ORDER BY vevnd_name;&#10;&#10;SELECT *&#10;FROM vendorlocations;</span><br></pre></td></tr></table></figure>
+<h4 id="视图查询，过滤数据">视图查询，过滤数据</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">//&#35270;&#22270;&#25226;cust_email = NULL &#30340;&#34892;&#36807;&#28388;&#25481;&#20102;&#10;//&#26597;&#35810;&#30340;&#26102;&#20505;&#23601;&#21487;&#20197;&#30465;&#21435;&#36807;&#28388;&#30340;&#27493;&#39588;&#10;CREATE VIEW customeremaillist AS&#10;SELECT cust_id, cust_name, cust_email&#10;FROM customers&#10;WHERE cust_email IS NOT NULL;&#10;&#10;SELECT *&#10;FROM customeremaillist;&#10;&#10;//&#22914;&#26524;&#22312;&#26597;&#35810;&#35270;&#22270;&#30340;&#26102;&#20505;&#65292;&#20197;&#21450;&#35270;&#22270;&#23454;&#29616;&#30340;&#26102;&#20505;&#37117;&#29992;&#21040;&#20102;WHERE&#20851;&#38190;&#23383;&#10;//&#37027;&#20040;&#65292;&#36825;&#20004;&#20010;WHERE &#23558;&#20250;&#34987;&#21512;&#24182;</span><br></pre></td></tr></table></figure>
+<h4 id="更新视图(INSERT,UPDATE,DELETE)">更新视图(INSERT,UPDATE,DELETE)</h4><p>原则：<strong>视图的主要目的是为了简化和方便检索</strong>，并不是所有所图都是可更新的。<br>简单来说，如果MySQL不能正确的确定被更新的基数据，则不允许更新。<br>如果视图有以下操作，则不能进行更新：</p>
+<ul>
+<li>GROUP BY 和 HAVING</li>
+<li>联结 JOIN </li>
+<li>子查询</li>
+<li>合并 UNION</li>
+<li>聚合函数 MIN(),MAX(),AVG(),SUM(),COUNT()</li>
+<li>DISTINCT</li>
+<li>包含计算</li>
+</ul>
+<h2 id="存储过程">存储过程</h2><h4 id="简介">简介</h4><p>存储过程可以认为是多条MySQL语句的集合，但是其又不仅仅只是MySQL语句的简单堆切，更形象一点的或许可以理解<br>为是MySQL中的批处理程序</p>
+<h4 id="为什么要使用存储过程">为什么要使用存储过程</h4><ul>
+<li>简化应用层逻辑</li>
+<li>安全,限制对基础数据的访问以减少数据出错</li>
+<li>提高性能,存储过程比单独的SQL语句要快</li>
+</ul>
+<h4 id="修改终止符">修改终止符</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">DELIMITER //&#10;...&#10;//&#10;DELIMITER;&#10;&#10;&#38500;\ &#31526;&#21495;&#22806;&#65292;&#20219;&#20309;&#23383;&#31526;&#37117;&#21487;&#20197;&#29992;&#20570;&#35821;&#21477;&#20998;&#38548;&#31526;</span><br></pre></td></tr></table></figure>
+<h4 id="查看存储过程创建">查看存储过程创建</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SHOW CREATE PROCEDURE ordertotal;</span><br></pre></td></tr></table></figure>
+<h4 id="变量传递">变量传递</h4><ul>
+<li>调用时,变量传递皆以 @ 开头</li>
+<li>声明时,变量分为 IN 和 OUT 两种类型，分别表示传入和传出<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CREATE PROCEDURE ordertotal(&#10;    IN onumber INT,&#10;    IN taxable BOOLEAN,&#10;    OUT ototal DECIMAL(8,2)&#10;)COMMENT &#39;Obtain order total,optionally add tax&#39;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h4 id="变量赋值">变量赋值</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT Avg(prod_price) INTO pa FROM products;</span><br></pre></td></tr></table></figure>
+<h4 id="变量声明">变量声明</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">DECLARE total DECIMAL(8,2);</span><br></pre></td></tr></table></figure>
+<h4 id="注释">注释</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">--</span><br></pre></td></tr></table></figure>
+<h4 id="调用存储过程">调用存储过程</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CALL ordertotal(20009,@total);</span><br></pre></td></tr></table></figure>
+<h4 id="一个完整的存储过程实例">一个完整的存储过程实例</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-- Name: ordertotal&#10;-- Parameters: onumber = order number&#10;--             taxable = 0 if not taxable ,1 if taxable&#10;--             ototal = order total variable&#10;CREATE PROCEDURE ordertotal(&#10;    IN onumber INT,&#10;    IN taxable BOOLEAN,&#10;    OUT ototal DECIMAL(8,2)&#10;)COMMENT &#39;Obtain order total,optionally add tax&#39;&#10;BEGIN&#10;    --Declare variable fot total&#10;    DECLARE total DECIMAL(8,2);&#10;&#10;    --Declare tax percentage&#10;    DECLARE taxrate INT DEFAULT 6;&#10;&#10;    --GET the order total&#10;    SELECT SUM(item_price * quantity)&#10;    FROM orderitems&#10;    WHERE order_num = onumber&#10;    INTO total;&#10;&#10;    --Is this taxable &#10;    IF taxable THEN&#10;        --Yes,so add taxrate to the total&#10;        SELELCT total + (total/100*taxrate) INTO total;&#10;    END IF;&#10;&#10;    --Finally,save to out variable&#10;    SELECT total INTo ototal;&#10;END;&#10;&#10;//&#35843;&#29992;&#10;CALL ordertotal(20005,0,@total);&#10;&#10;//&#33719;&#21462;&#35745;&#31639;&#32467;&#26524;total&#10;SELECT @total;</span><br></pre></td></tr></table></figure>
+<h2 id="游标">游标</h2><h4 id="概述-1">概述</h4><p>游标（cursor）是一个存储在MySQL中的数据库查询，它不是一条SELECT语句，而是被该语句检索出来的结果即。通过游标，我们可以对结果即进行跟进一步的处理。<br>MySQL的游标只能被用于存储过程和函数</p>
+<h4 id="声明游标">声明游标</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CREATE PROCEDURE processorders()&#10;BEGIN&#10;    DECLARE ordernumbers CURSOR&#10;    FOR &#10;    SELECT order_num FROm orders;&#10;END;</span><br></pre></td></tr></table></figure>
+<h4 id="打开游标">打开游标</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">OPEN ordernumbers;</span><br></pre></td></tr></table></figure>
+<h4 id="关闭游标">关闭游标</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CLOSE ordernumbers;</span><br></pre></td></tr></table></figure>
+<h4 id="REPEAT_…_FETCH_…_UNTIL_()_END_REPEAT">REPEAT … FETCH … UNTIL () END REPEAT</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">OPEN ordernumbers;&#10;REPEAT&#10;    FETCH ordernumbers INTO o&#10;UNTIL done END REPEAT;&#10;CLOSE ordernumbers;</span><br></pre></td></tr></table></figure>
+<h4 id="DECLARE_CONTINUE_HANDLER_FOR_…">DECLARE CONTINUE HANDLER FOR …</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">//&#35774;&#32622;&#26465;&#20214;&#10;//&#24403;SQLSTATE &#8216;02000&#8217; &#20986;&#29616;&#26102;&#65292;&#35774;&#32622;done = 1&#10;DECLARE CONTINUE HANDLER FOR SQLSTATE &#39;0200&#39; SET done = 1;</span><br></pre></td></tr></table></figure>
+<h4 id="一个完整的游标例子">一个完整的游标例子</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CREATE PROCEDURE processorders()&#10;BEGIN&#10;    DECLARE done BOOLEAN DEFAULT 0;&#10;    DECLARE o INT;&#10;    DECLARE t DECIMAL(8,2);&#10;&#10;    DECLARE ordernumbers CURSOR&#10;    FOR&#10;    SELECT order_num FROM orders;&#10;    DECLARE CONTINUE HANDLER FOR SQLSTATE &#39;02000&#39; SET done = 1;&#10;&#10;    CREATE TABLE IF NOT EXISTS ordertotals&#10;        (order_num INT, total DECIMAL(8,2));&#10;&#10;    OPEN ordernumbers;&#10;&#10;    REPEAT&#10;        FETCH ordernumbers INTO o;&#10;        CALL ordertoal(o,1,t);&#10;&#10;        INSERT INTO ordertotals(order_num,total)&#10;        VALUES(o,t);&#10;    UNTIL doen END REPEAT;&#10;    &#10;    CLOSE ordernumbers;&#10;END;</span><br></pre></td></tr></table></figure>
+<h2 id="触发器">触发器</h2><h4 id="简介-1">简介</h4><p>通过创建触发器，设置在DELETE/UPDATE/INSERT的BEFORE/AFTER时触发一个事件。</p>
+<h4 id="可以使用触发器的语句">可以使用触发器的语句</h4><ul>
+<li>DELETE</li>
+<li>INSERT</li>
+<li>UPDATE</li>
+</ul>
+<h4 id="创建触发器">创建触发器</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE account(acct_num INT,amount DECIMAL(10,2));&#10;&#10;CREATE TRIGGER ins_sum BEFORE INSER ON account&#10;FOR EACH ROW SET @sum = @sum + NEW.amount;&#10;&#10;SET @sum = 0;&#10;INSERT INTO account VALUES(137,14.98),(141,1937.50),(97,-100.00);&#10;SELECT @sum AS &#39;Total amount inserted&#39;;&#10;+-----------------------+&#10;| Total amount inserted |&#10;+-----------------------+&#10;| 1852.48               |&#10;+-----------------------+&#10;//&#22312;&#21521;products&#25554;&#20837;&#19968;&#26465;&#25968;&#25454;&#20197;&#21518;&#20250;&#26174;&#31034;&#8216;&#39;;</span><br></pre></td></tr></table></figure>
+<h4 id="删除一个触发器">删除一个触发器</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">DROP TRIGGER test.ins_sum;</span><br></pre></td></tr></table></figure>
+<h4 id="Example">Example</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">delimiter //&#10;CREATE TRIGGER upd_check BEFORE UPDATE ON account&#10;FOR EACH ROW&#10;BEGIN&#10;   IF NEW.amount &#60; 0 THEN&#10;      SET NEW.amount = 0;&#10;   ELSEIF NEW.amount &#62; 100 THEN&#10;      SET NEW.amount = 100;&#10;   END IF;&#10;END;//&#10;delimiter ;</span><br></pre></td></tr></table></figure>
+<h4 id="注意点：">注意点：</h4><ul>
+<li>不能在同一个表上添加多个同类型的触发器（如：不能针对同一个表添加两个BEFORE UPDATE 触发器）</li>
+<li>每个数据库中，触发器的名字必须是唯一的</li>
+</ul>
+<h2 id="用户权限管理">用户权限管理</h2><h4 id="查看用户">查看用户</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">USE mysql;&#10;SELECT user FROM user;</span><br></pre></td></tr></table></figure>
+<h4 id="创建用户">创建用户</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CREATE USER zz IDENTIFIED BY &#39;p@ssw0rd&#39;;&#10;&#10;//IDENTIFIED BY &#35774;&#32622;&#23494;&#30721;&#65292;&#26368;&#32456;&#20445;&#25345;&#30340;&#23494;&#30721;&#26159;&#32463;&#36807;&#21152;&#23494;&#30340;</span><br></pre></td></tr></table></figure>
+<h4 id="重命名用于">重命名用于</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">RENAME USER zz TO zoth;&#10;//&#38656;&#35201;&#26377;CREATE &#26435;&#38480;</span><br></pre></td></tr></table></figure>
+<h4 id="删除账号">删除账号</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">DROP USER zoth;</span><br></pre></td></tr></table></figure>
+<h4 id="查看访问权限">查看访问权限</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SHOW GRANTS FOR zoth;</span><br></pre></td></tr></table></figure>
+<h4 id="设置访问权限_GRANT_…_REVOKE_…">设置访问权限 GRANT … REVOKE …</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GRANT SELECT ON crashcourse.* TO zoth;&#10;//&#36171;&#20104;zoth&#23545;crashcourse&#25968;&#25454;&#24211;&#20013;&#25152;&#26377;&#34920;&#30340;&#35835;&#65288;select&#65289;&#26435;&#38480;</span><br></pre></td></tr></table></figure>
+<h4 id="取消权限">取消权限</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">REVOKE SELECT ON crashcourse.* TO zoth;</span><br></pre></td></tr></table></figure>
+<h4 id="权限控制层次">权限控制层次</h4><ul>
+<li>整个服务器 GRANT ALL/ REVOKE ALL</li>
+<li>整个数据库 ON database.*</li>
+<li>特定的表 ON database.table</li>
+<li>特定的列</li>
+<li>特定的存储过程</li>
+</ul>
+<h4 id="权限列表">权限列表</h4><table>
+<thead>
+<tr>
+<th style="text-align:center">权限</th>
+<th style="text-align:left">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">ALL</td>
+<td style="text-align:left">除GRANT OPTION 外的所有权限</td>
+</tr>
+<tr>
+<td style="text-align:center">ALTER</td>
+<td style="text-align:left">ALTER TABLE</td>
+</tr>
+<tr>
+<td style="text-align:center">ALTER ROUTINE</td>
+<td style="text-align:left">ALTER PROCEDURE / DROP PROCEDURE</td>
+</tr>
+<tr>
+<td style="text-align:center">CREATE</td>
+<td style="text-align:left">CREATE TABLE</td>
+</tr>
+<tr>
+<td style="text-align:center">CREATE ROUTINE</td>
+<td style="text-align:left">CREATE PROCEDURE</td>
+</tr>
+<tr>
+<td style="text-align:center">CREATE TEMPORARY TABLES</td>
+<td style="text-align:left">CREATE TEMPORARY TABLE</td>
+</tr>
+<tr>
+<td style="text-align:center">CREATE USER</td>
+<td style="text-align:left">CREATE USER/ DROP USER / RENAME USER /REVOKE ALL PRIVILEGES</td>
+</tr>
+<tr>
+<td style="text-align:center">CREATE VIEW</td>
+<td style="text-align:left">CREATE VIEW</td>
+</tr>
+<tr>
+<td style="text-align:center">DELETE</td>
+<td style="text-align:left">DELETE</td>
+</tr>
+<tr>
+<td style="text-align:center">DROP</td>
+<td style="text-align:left">DROP TABLE</td>
+</tr>
+<tr>
+<td style="text-align:center">EXECURE</td>
+<td style="text-align:left">CALL / 存储过程</td>
+</tr>
+<tr>
+<td style="text-align:center">FILE</td>
+<td style="text-align:left">SELECT INTO OUTFILE/ LOAD DATA INFILE</td>
+</tr>
+<tr>
+<td style="text-align:center">GRANT OPTION</td>
+<td style="text-align:left">GRANT / REVOKE</td>
+</tr>
+<tr>
+<td style="text-align:center">INDEX</td>
+<td style="text-align:left">CREATE INDEX / DROP INDEX</td>
+</tr>
+<tr>
+<td style="text-align:center">INSERT</td>
+<td style="text-align:left">INSERT</td>
+</tr>
+<tr>
+<td style="text-align:center">LOCK TABLES</td>
+<td style="text-align:left">LOCK TABLES</td>
+</tr>
+<tr>
+<td style="text-align:center">PROCESS</td>
+<td style="text-align:left">SHOW FULL PROCESSLIST</td>
+</tr>
+<tr>
+<td style="text-align:center">RELOAD</td>
+<td style="text-align:left">FLUSH</td>
+</tr>
+<tr>
+<td style="text-align:center">PRELICATION CLIENT</td>
+<td style="text-align:left">服务器位置访问</td>
+</tr>
+<tr>
+<td style="text-align:center">REPLICATION SLAVE</td>
+<td style="text-align:left">???</td>
+</tr>
+<tr>
+<td style="text-align:center">SELECT</td>
+<td style="text-align:left">SELECT</td>
+</tr>
+<tr>
+<td style="text-align:center">SHOW DATABASES</td>
+<td style="text-align:left">SHOW DATABASES</td>
+</tr>
+<tr>
+<td style="text-align:center">SHOW VIEW</td>
+<td style="text-align:left">SHOW VIEW</td>
+</tr>
+<tr>
+<td style="text-align:center">SHUTDOWN</td>
+<td style="text-align:left">mysqladmin shutdown</td>
+</tr>
+<tr>
+<td style="text-align:center">SUPER</td>
+<td style="text-align:left">CHANGE MASTER, KILL ,LOGS, PURGE, MASTER, SET GLOBAL</td>
+</tr>
+<tr>
+<td style="text-align:center">UPDATE</td>
+<td style="text-align:left">UPDATE</td>
+</tr>
+<tr>
+<td style="text-align:center">USAGE</td>
+<td style="text-align:left">无访问权限</td>
+</tr>
+</tbody>
+</table>
+<h2 id="参考资料">参考资料</h2><ul>
+<li><a href="http://book.douban.com/subject/3354490" target="_blank" rel="external">MySQL 必知必会</a></li>
+<li><a href="http://dev.mysql.com/doc/refman/5.5/en/trigger-syntax.html" target="_blank" rel="external">MySQL Trigger Syntax and Examples</a></li>
+</ul>
+
+      
+    </div>
+
+    <div class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/MySQL/"> #MySQL </a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/03/05/big-endian-and-little-endian/">浅谈大端模式和小端模式</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/01/26/mysql-crash-course-2/">MySQL 知识点整理二</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </div>
+  </div>
+
+
+
+    
+
+    
+      <div class="comments" id="comments">
+        
+          <div class="ds-thread" data-thread-key="2015/02/01/mysql-crash-course-3/"
+               data-title="MySQL 知识点整理三" data-url="http://fengcode.com/2015/02/01/mysql-crash-course-3/">
+          </div>
+        
+      </div>
+    
+  </div>
+
+
+        </div>
+
+        
+      </div>
+
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview">
+        <div class="site-author motion-element">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="KanTian" />
+          <p class="site-author-name">KanTian</p>
+        </div>
+        <p class="site-description motion-element">技术是一场修行...</p>
+        <div class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">5</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">2</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            
+              <span class="site-state-item-count">2</span>
+              <span class="site-state-item-name">标签</span>
+              
+          </div>
+
+        </div>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml">
+              <i class="menu-item-icon icon-feed"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+              <a href="https://github.com/kantian" target="_blank">github</a>
+            </span>
+            
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element">
+            <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+      </div>
+
+      
+        <div class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#视图"><span class="nav-number">2.</span> <span class="nav-text">视图</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#视图简介"><span class="nav-number">2.0.1.</span> <span class="nav-text">视图简介</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#视图的规则和限制"><span class="nav-number">2.0.2.</span> <span class="nav-text">视图的规则和限制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#创建视图"><span class="nav-number">2.0.3.</span> <span class="nav-text">创建视图</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#查看视图创建语句"><span class="nav-number">2.0.4.</span> <span class="nav-text">查看视图创建语句</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#删除视图"><span class="nav-number">2.0.5.</span> <span class="nav-text">删除视图</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#修改视图"><span class="nav-number">2.0.6.</span> <span class="nav-text">修改视图</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#利用视图进行查询"><span class="nav-number">2.0.7.</span> <span class="nav-text">利用视图进行查询</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#创建视图，重新格式化查询数据"><span class="nav-number">2.0.8.</span> <span class="nav-text">创建视图，重新格式化查询数据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#视图查询，过滤数据"><span class="nav-number">2.0.9.</span> <span class="nav-text">视图查询，过滤数据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#更新视图(INSERT,UPDATE,DELETE)"><span class="nav-number">2.0.10.</span> <span class="nav-text">更新视图(INSERT,UPDATE,DELETE)</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#存储过程"><span class="nav-number">3.</span> <span class="nav-text">存储过程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#简介"><span class="nav-number">3.0.1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#为什么要使用存储过程"><span class="nav-number">3.0.2.</span> <span class="nav-text">为什么要使用存储过程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#修改终止符"><span class="nav-number">3.0.3.</span> <span class="nav-text">修改终止符</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#查看存储过程创建"><span class="nav-number">3.0.4.</span> <span class="nav-text">查看存储过程创建</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#变量传递"><span class="nav-number">3.0.5.</span> <span class="nav-text">变量传递</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#变量赋值"><span class="nav-number">3.0.6.</span> <span class="nav-text">变量赋值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#变量声明"><span class="nav-number">3.0.7.</span> <span class="nav-text">变量声明</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#注释"><span class="nav-number">3.0.8.</span> <span class="nav-text">注释</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#调用存储过程"><span class="nav-number">3.0.9.</span> <span class="nav-text">调用存储过程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#一个完整的存储过程实例"><span class="nav-number">3.0.10.</span> <span class="nav-text">一个完整的存储过程实例</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#游标"><span class="nav-number">4.</span> <span class="nav-text">游标</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#概述-1"><span class="nav-number">4.0.1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#声明游标"><span class="nav-number">4.0.2.</span> <span class="nav-text">声明游标</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#打开游标"><span class="nav-number">4.0.3.</span> <span class="nav-text">打开游标</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#关闭游标"><span class="nav-number">4.0.4.</span> <span class="nav-text">关闭游标</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#REPEAT_…_FETCH_…_UNTIL_()_END_REPEAT"><span class="nav-number">4.0.5.</span> <span class="nav-text">REPEAT … FETCH … UNTIL () END REPEAT</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DECLARE_CONTINUE_HANDLER_FOR_…"><span class="nav-number">4.0.6.</span> <span class="nav-text">DECLARE CONTINUE HANDLER FOR …</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#一个完整的游标例子"><span class="nav-number">4.0.7.</span> <span class="nav-text">一个完整的游标例子</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#触发器"><span class="nav-number">5.</span> <span class="nav-text">触发器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#简介-1"><span class="nav-number">5.0.1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#可以使用触发器的语句"><span class="nav-number">5.0.2.</span> <span class="nav-text">可以使用触发器的语句</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#创建触发器"><span class="nav-number">5.0.3.</span> <span class="nav-text">创建触发器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#删除一个触发器"><span class="nav-number">5.0.4.</span> <span class="nav-text">删除一个触发器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Example"><span class="nav-number">5.0.5.</span> <span class="nav-text">Example</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#注意点："><span class="nav-number">5.0.6.</span> <span class="nav-text">注意点：</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#用户权限管理"><span class="nav-number">6.</span> <span class="nav-text">用户权限管理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#查看用户"><span class="nav-number">6.0.1.</span> <span class="nav-text">查看用户</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#创建用户"><span class="nav-number">6.0.2.</span> <span class="nav-text">创建用户</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#重命名用于"><span class="nav-number">6.0.3.</span> <span class="nav-text">重命名用于</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#删除账号"><span class="nav-number">6.0.4.</span> <span class="nav-text">删除账号</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#查看访问权限"><span class="nav-number">6.0.5.</span> <span class="nav-text">查看访问权限</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#设置访问权限_GRANT_…_REVOKE_…"><span class="nav-number">6.0.6.</span> <span class="nav-text">设置访问权限 GRANT … REVOKE …</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#取消权限"><span class="nav-number">6.0.7.</span> <span class="nav-text">取消权限</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#权限控制层次"><span class="nav-number">6.0.8.</span> <span class="nav-text">权限控制层次</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#权限列表"><span class="nav-number">6.0.9.</span> <span class="nav-text">权限列表</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">7.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </div>
+      
+
+    </div>
+  </div>
+
+
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp; 
+  2015
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">KanTian</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.3"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.3"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.3" id="motion.global"></script>
+
+
+
+  <script type="text/javascript" src="/js/search-toggle.js"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.3" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+      var $tocContent = $('.post-toc-content');
+      if (isDesktop() && CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    });
+  </script>
+
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"kantian"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+
+
+  
+  
+
+</body>
+</html>

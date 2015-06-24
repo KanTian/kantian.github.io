@@ -1,0 +1,713 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.3"/>
+
+
+    <meta name="description" content="技术是一场修行..." />
+
+
+
+  <meta name="keywords" content="MySQL," />
+
+
+
+  <link rel="alternate" href="/atom.xml" title="kantian's Notes" type="application/atom+xml" />
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.3" />
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    analytics: {
+      google: ''
+    },
+    sidebar: 'hide'
+  };
+</script>
+
+
+
+
+  <title> MySQL 知识点整理二 // kantian's Notes </title>
+</head>
+
+<body>
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand">
+      <span class="logo">
+        <i class="icon-logo"></i>
+      </span>
+      <span class="site-title">kantian's Notes</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<div class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            <i class="menu-item-icon icon-archives"></i> <br />
+            文章列表
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            <i class="menu-item-icon icon-categories"></i> <br />
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            <i class="menu-item-icon icon-about"></i> <br />
+            关于
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+</div>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              MySQL 知识点整理二
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2015-01-26
+        </span>
+
+        
+          <span class="post-category">
+            &nbsp; | &nbsp; 分类于
+            
+              <a href="/categories/MySQL/">MySQL</a>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2015/01/26/mysql-crash-course-2/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2015/01/26/mysql-crash-course-2/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <h2 id="概述">概述</h2><p>本文接上文<a href="http://www.fengcode.com/blog/2015/01/14/mysql-crash-course-1/" target="_blank" rel="external">MySQL 知识点整理(上)</a><br>本部分主要梳理了MySQL的分组查询、子查询、联结表、组合查询、全文搜索、以及插入/更新/删除数据等。</p>
+<h2 id="GROUP_BY_分组数据">GROUP BY 分组数据</h2><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT vend_id, COUNT(*) AS num_prods&#10;FROM products&#10;GROUP BY vend_id;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>对分组结果进行过滤</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT cust_id, COUNT(*) AS orders&#10;FROM orders&#10;GROUP BY cust_id&#10;HAVING COUNT(*) &#62;= 2;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>HAVING 和 WHERE 的区别：<br>WHERE在数据分组之前进行过滤，HAVING在数据分组后进行过滤。<br>如果WHERE和HAVING同时使用，则需要注意，WHERE排除的行不包括在分组内。</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT vend_id, COUNT(*) AS num_prods&#10;FROM products&#10;WHERE prod_price &#62;= 10&#10;GROUP BY vend_id&#10;HAVING COUNT(*) &#62;= 2;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>分组和排序<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">//&#19968;&#33324;GROUP BY&#20197;&#21518; &#65292;&#29992;ORDER BY &#30830;&#20445;&#25968;&#25454;&#26159;&#27491;&#30830;&#25490;&#24207;&#30340;&#10;SELECT order_num, SUM(quantity * item_price) AS ordertotal&#10;FROM orderitems&#10;GROUP BY order_num&#10;HAVING SUM(quantity * item_price) &#62;= 50&#10;ORDER BY ordertotal;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="子查询">子查询</h2><ul>
+<li><p>一级子查询</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT cust_id&#10;FROM order&#10;WHERE order_num IN(&#10;    SELECT order_num &#10;    FROM orderitems&#10;    WHERE prod_id = &#39;TNT2&#39;);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>多级子查询</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT cust_name, cust_contact&#10;FROM customers&#10;WHERE cust_id IN (SELECT cust_id&#10;                    FROM orders&#10;                    WHERE order_num IN(SELECT order_num&#10;                                        FROM orderitems&#10;                                        WHERE prod_id = &#39;TNT2&#39;));</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>子查询作为结果的一部分</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT cust_name,&#10;       cust_state,&#10;       (SELECT COUNT(*)&#10;        FROM orders&#10;        WHERE orders.cust_id = customers.cust_id) AS orders&#10;FROM customers&#10;ORDER BY cust_name;&#10;&#10;//&#27880;&#24847;orders.cust_id = customers.cust_id &#22312;&#24341;&#29992;&#30340;&#21015;&#21487;&#33021;&#20986;&#29616;&#20108;&#20041;&#24615;&#26159;&#65292;&#10;&#24517;&#39035;&#29992;&#23436;&#20840;&#38480;&#23450;&#21015;&#21517;,&#29992;&#19968;&#20010;&#28857;&#20998;&#38548;&#30340;&#34920;&#21517;&#21644;&#21015;&#21517;&#12290;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="联结表">联结表</h2><ul>
+<li><p>普通联结</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT vend_name, prod_name, prod_price&#10;FROM vendors, products&#10;WHERE vendors.vend_id = products.vend_id&#10;ORDER BY vend_name, prod_name;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>笛卡尔积(第一个表的行*第二个表的行) 没有指明条件的情况下</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT vend_name, prod_name, prod_price&#10;FROM vendors, products&#10;ORDER BY vend_name, prod_name;&#10;&#10;//&#19981;&#35201;&#24536;&#20102;WHERE</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h4 id="内部联结">内部联结</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">//&#26126;&#30830;&#23450;&#20041;&#32852;&#32467;&#31867;&#22411;&#8212;&#8212;&#20869;&#37096;&#32852;&#32467;&#10;SELECT vend_name, prod_name, prod_price&#10;FROM vendors INNER JOIN products&#10;ON vendors.vend_id = products.vend_id;</span><br></pre></td></tr></table></figure>
+<h4 id="联结多个表">联结多个表</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT prod_name, vend_name, prod_price, quantity&#10;FROM orderitems, products, vendors&#10;WHERE products.vend_id = vendors.vend_id&#10;    AND orderitems.prod_id = products.prod_id&#10;    AND order_num = 20005;</span><br></pre></td></tr></table></figure>
+<h4 id="使用表别名">使用表别名</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT cust_name, cust_contact&#10;FROM customers AS c, orders AS o, orderitems AS oi&#10;WHERE c.cust_id = o.cust_id&#10;    AND oi.order_num = o.order_num&#10;    AND prod_id = &#39;TNT2&#39;;</span><br></pre></td></tr></table></figure>
+<h4 id="自联结">自联结</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT prod_id, prod_name&#10;FROM products&#10;WHERE vend_id = (SELECT vend_id&#10;                 FROM products&#10;                 WHERE prod_id = &#39;DTNTR&#39;);&#10;&#31561;&#20215;&#20110;&#10;&#10;SELECT p1.prod_id, p1.prod_name&#10;FROM products AS p1, products AS p2&#10;WHERE p1.vend_id = p2.vend_id&#10;    AND p2.prod_id = &#39;DTNTR&#39;&#65307;</span><br></pre></td></tr></table></figure>
+<h4 id="自然联结">自然联结</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">//&#33258;&#28982;&#32852;&#32467;&#25490;&#38500;&#21015;&#20986;&#29616;&#22810;&#27425;&#30340;&#21487;&#33021;&#65292;&#20351;&#32467;&#26524;&#20013;&#27599;&#20010;&#21015;&#21482;&#36820;&#22238;&#19968;&#27425;&#10;&#10;SELECT c.*, o.order_num, o.order_date,&#10;        oi.prod_id, oi.quantity,oi.item_price&#10;FROM customers AS c, orders AS o, orderitems AS oi&#10;WHERE c.cust_id = o.cust_id&#10;    AND oi.order_num = o.order_num&#10;    AND oi.prod_id = &#39;FB&#39;;</span><br></pre></td></tr></table></figure>
+<h4 id="外部联结">外部联结</h4><ul>
+<li><p>LEFT OUTER JOIN … ON</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT customers.cust_id, orders.order_num &#10;FROM customers LEFT OUTER JOIN orders&#10;ON customers.cust_id = orders.cust_id;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>RIGHT OUTER JOIN … ON</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT customers.cust_id, orders.order_num&#10;FROM customers RIGHT OUTER JOIN orders&#10;ON orders.cust_id = customers.cust_id;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>INNER JOIN … GROUP BY</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT customers.cust_name,&#10;        customers.cust_id,&#10;        COUNT(orders.order_num) AS num_ord&#10;FROM customers INNER JOIN orders&#10;ON customers.cust_id = orders.cust_id&#10;GROUP BY customers.cust_id;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>LELFT OUTER JOIN … ON … GROUP BY</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT customers.cust_name,&#10;        customers.cust_id,&#10;        COUNT(orders.order_num) AS num_ord&#10;FROM customers LEFT OUTER JOIN orders&#10;ON customers.cust_id = orders.cust_id&#10;GROUP BY customers.cust_id;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="UNION_组合查询">UNION 组合查询</h2><p>UNION 规则：</p>
+<ul>
+<li>UNION 必须由两条或两条以上的SELECT语句组成，语句之间用UNION分隔</li>
+<li>UNION 中的每个查询必须包含相同的列，表达式或聚合函数（列的顺序不一定要相同）</li>
+<li>列数据类型必须兼容:类型不必完全相同，但补习是DBMS可以隐含地转换的类型（有可能两种表中相同的列采用了不同的数据类型）</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">//UNION ALL &#21487;&#33021;&#21253;&#21547;&#37325;&#22797;&#30340;&#34892;&#65288;&#21363;&#28385;&#36275;prod_price &#60;=5 &#21448;&#28385;&#36275; vend_id IN (1001,1002&#65289;&#30340;&#34892;&#20986;&#29616;&#20004;&#27425;&#10;//UNION &#33258;&#21160;&#21435;&#38500;&#37325;&#22797;&#30340;&#34892;&#65288;&#20854;&#34892;&#20026;&#19982;&#21333;&#20010;SELECT&#35821;&#21477;&#65292;&#22810;&#20010;WHERE&#26465;&#20214;&#30456;&#21516; WHERE prod_price &#60;=5 OR vend_id IN (1001,1002);)&#10;SELECT vend_id, prod_id, prod_price&#10;FROM products&#10;WHERE prod_price &#60;= 5&#10;UNION ALL &#10;SELECT vend_id, prod_id, prod_price&#10;FROM products&#10;WHERE vend_id IN (1001,1002);</span><br></pre></td></tr></table></figure>
+<h2 id="全文本搜索">全文本搜索</h2><ul>
+<li>MyISAM 引擎支持全文本搜索</li>
+<li><p>InnoDB 引擎不支持全文搜索</p>
+</li>
+<li><p>匹配note_text 列中包含anvils 关键字的行</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT note_text&#10;FROM productnotes&#10;WHERE Match(note_text) Against(&#39;anvils&#39;);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>使用查询扩展 （会匹配出一些不包含anvils但是相关联的行）</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT note_text&#10;FROM productnotes&#10;WHERE Match(note_text) Against (&#39;anvils&#39; WITH QUERY EXPANSION);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>BOOL 模式</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT note_text&#10;FROM productnotes&#10;WHERE Match(note_text) Against (&#39;heavy -rope*&#39; IN BOOLEAN MODE);&#10;&#25490;&#38500;&#20219;&#20309;&#21253;&#21547;rope&#24320;&#22987;&#30340;&#35789;&#30340;&#34892;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>全文本布尔操作符</p>
+<table>
+<thead>
+<tr>
+<th>布尔操作符</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>+</td>
+<td>包含，词必须存在</td>
+</tr>
+<tr>
+<td>-</td>
+<td>排除，词必须不出现</td>
+</tr>
+<tr>
+<td>&gt;</td>
+<td>包含，而且增加等级值</td>
+</tr>
+<tr>
+<td>&lt;</td>
+<td>包含，而且减小等级值</td>
+</tr>
+<tr>
+<td>()</td>
+<td>把词组成子表达式（允许这些子表达式作为组被包含、排除、排列等)</td>
+</tr>
+<tr>
+<td>~</td>
+<td>取消一个词的排序值</td>
+</tr>
+<tr>
+<td>*</td>
+<td>词尾的通配符</td>
+</tr>
+<tr>
+<td>“”</td>
+<td>定义一个短语（与单个词的列表不一样，它匹配整个短语以便包含或排除这个短语)</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><p>搜索匹配包含词rabbit和bait的行</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT note_text&#10;FROM productnotes&#10;WHERE Match(note_text) Against(&#39;+rabbit +bait&#39; IN BOOLEAN MODE);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>搜索匹配包含rabbit和bait中的至少一个的行</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT note_text&#10;FROM productnotes&#10;WHERE Match(note_text) Against(&#39;rabbit bait&#39; IN BOOLEAN MODE);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>搜索匹配短语rabbit bait 而不是匹配两个词 rabbit 和 bait</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT note_text&#10;FROM productnotes&#10;WHERE Match(note_text) Against(&#39;&#34;rabbit bait&#34;&#39; IN BOOLEAN MODE);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>搜索匹配包含rabbit和carrot至少一个的词，增加前者的等级，降低后者的等级</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT note_text&#10;FROM productnotes&#10;WHERE Match(note_text) Against (&#39;&#62;rabbit &#60;carrot&#39; IN BOOLEAN MODE);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>搜索匹配词safe和combination，降低后者的等级</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT note_text&#10;FROM productnotes&#10;WHERE Match(note_text) Against(&#39;+safe +(&#60;combination)&#39; IN BOOLEAN MODE);</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="参考资料">参考资料</h2><ul>
+<li><a href="http://book.douban.com/subject/3354490/" target="_blank" rel="external">MySQL 必知必会</a></li>
+</ul>
+
+      
+    </div>
+
+    <div class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/MySQL/"> #MySQL </a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/02/01/mysql-crash-course-3/">MySQL 知识点整理三</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/01/24/mysql-crash-course-1/">MySQL 知识点整理一</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </div>
+  </div>
+
+
+
+    
+
+    
+      <div class="comments" id="comments">
+        
+          <div class="ds-thread" data-thread-key="2015/01/26/mysql-crash-course-2/"
+               data-title="MySQL 知识点整理二" data-url="http://fengcode.com/2015/01/26/mysql-crash-course-2/">
+          </div>
+        
+      </div>
+    
+  </div>
+
+
+        </div>
+
+        
+      </div>
+
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview">
+        <div class="site-author motion-element">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="KanTian" />
+          <p class="site-author-name">KanTian</p>
+        </div>
+        <p class="site-description motion-element">技术是一场修行...</p>
+        <div class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">5</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">2</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            
+              <span class="site-state-item-count">2</span>
+              <span class="site-state-item-name">标签</span>
+              
+          </div>
+
+        </div>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml">
+              <i class="menu-item-icon icon-feed"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+              <a href="https://github.com/kantian" target="_blank">github</a>
+            </span>
+            
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element">
+            <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+      </div>
+
+      
+        <div class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GROUP_BY_分组数据"><span class="nav-number">2.</span> <span class="nav-text">GROUP BY 分组数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#子查询"><span class="nav-number">3.</span> <span class="nav-text">子查询</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#联结表"><span class="nav-number">4.</span> <span class="nav-text">联结表</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#内部联结"><span class="nav-number">4.0.1.</span> <span class="nav-text">内部联结</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#联结多个表"><span class="nav-number">4.0.2.</span> <span class="nav-text">联结多个表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用表别名"><span class="nav-number">4.0.3.</span> <span class="nav-text">使用表别名</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#自联结"><span class="nav-number">4.0.4.</span> <span class="nav-text">自联结</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#自然联结"><span class="nav-number">4.0.5.</span> <span class="nav-text">自然联结</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#外部联结"><span class="nav-number">4.0.6.</span> <span class="nav-text">外部联结</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UNION_组合查询"><span class="nav-number">5.</span> <span class="nav-text">UNION 组合查询</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#全文本搜索"><span class="nav-number">6.</span> <span class="nav-text">全文本搜索</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">7.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </div>
+      
+
+    </div>
+  </div>
+
+
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp; 
+  2015
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">KanTian</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.3"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.3"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.3" id="motion.global"></script>
+
+
+
+  <script type="text/javascript" src="/js/search-toggle.js"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.3" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+      var $tocContent = $('.post-toc-content');
+      if (isDesktop() && CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    });
+  </script>
+
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"kantian"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+
+
+  
+  
+
+</body>
+</html>
