@@ -47,7 +47,7 @@
 
 
 
-  <title> hdu web auth // kantian's Notes </title>
+  <title> 记一次问题的解决 // kantian's Notes </title>
 </head>
 
 <body>
@@ -160,7 +160,7 @@
           
           
             
-              hdu web auth
+              记一次问题的解决
             
           
         </h1>
@@ -205,6 +205,7 @@
       
         <h3 id="背景">背景</h3><p>学校要求所有的机子都需要输入学号和密码才能访问外网，导致实验室的一台CentOS服务器也未能幸免。<br>这台CentOS服务器装的是minial版本的，也就是说没有任何可视界面，因此常规的在浏览器里登录自然不行了。</p>
 <h3 id="实施">实施</h3><p>因为有过一点爬虫的基础，于是想当然的想到，写个脚本模拟登录不是就可以了？<br>于是便有了以下这个脚本：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># HDU WebAuth For Centos Without GNOME Desktop</span></span><br><span class="line"><span class="comment"># Copyright 2015 edeng.zheng@gmail.com</span></span><br><span class="line"><span class="comment"># 2015-05-13</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> urllib</span><br><span class="line"><span class="keyword">import</span> urllib2</span><br><span class="line"><span class="keyword">import</span> getpass</span><br><span class="line"></span><br><span class="line"><span class="comment">#request url</span></span><br><span class="line">url = <span class="string">'http://IPAddress/webAuth/index.htm?'</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#get the username and password</span></span><br><span class="line">myusername = raw_input(<span class="string">"Enter your username:"</span>)</span><br><span class="line">mypasswd = getpass.getpass(<span class="string">"Enter your passwd:"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#encode the post data</span></span><br><span class="line">values = &#123;<span class="string">'username'</span>:myusername,<span class="string">'pwd'</span>:mypasswd&#125;</span><br><span class="line">data = urllib.urlencode(values)</span><br><span class="line"></span><br><span class="line"><span class="comment">#post the request</span></span><br><span class="line">req = urllib2.Request(url,data)</span><br><span class="line">response = urllib2.urlopen(req)</span><br><span class="line"></span><br><span class="line"><span class="comment">#get the response page</span></span><br><span class="line">ret_page = response.read()</span><br><span class="line"></span><br><span class="line"><span class="comment">#return succeed or failed</span></span><br><span class="line">flag_success = <span class="string">"var tips="</span></span><br><span class="line">flag_success.decode(<span class="string">'utf8'</span>)</span><br><span class="line">result = ret_page.find(flag_success)</span><br><span class="line"></span><br><span class="line"><span class="comment">#print result;</span></span><br><span class="line"><span class="keyword">if</span> result &gt;= <span class="number">0</span>:</span><br><span class="line">    <span class="keyword">print</span> <span class="string">'Login Success!'</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    <span class="keyword">print</span> <span class="string">'Login Failed!'</span></span><br></pre></td></tr></table></figure></p>
+<p>原谅我把登录成功的检测匹配写的这么恶心，逃…</p>
 <h3 id="测试">测试</h3><p>登录以后就可以ping通外网了<br><img src="/img/webauth.png" alt="测试"></p>
 <h3 id="后记">后记</h3><p>实验室的小伙伴脑洞打开，如果把用户名写死，然后让脚本在每次开机启动的时候自动运行，不是就不用每次都进行麻烦的手动登录了？嗯，确实是一个好主意！</p>
 
@@ -247,7 +248,7 @@
       <div class="comments" id="comments">
         
           <div class="ds-thread" data-thread-key="2015/06/25/hdu-web-auth/"
-               data-title="hdu web auth" data-url="http://fengcode.com/2015/06/25/hdu-web-auth/">
+               data-title="记一次问题的解决" data-url="http://fengcode.com/2015/06/25/hdu-web-auth/">
           </div>
         
       </div>
