@@ -5,7 +5,7 @@
   <subtitle><![CDATA[技术是一场修行...]]></subtitle>
   <link href="/atom.xml" rel="self"/>
   <link href="http://fengcode.com//"/>
-  <updated>2015-06-25T08:30:29.138Z</updated>
+  <updated>2015-07-01T14:53:25.699Z</updated>
   <id>http://fengcode.com//</id>
   
   <author>
@@ -14,6 +14,63 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title><![CDATA[PHP设计模式笔记--工厂方法(Facroty Method)]]></title>
+    <link href="http://fengcode.com/2015/06/30/design-pattern-factory-method/"/>
+    <id>http://fengcode.com/2015/06/30/design-pattern-factory-method/</id>
+    <published>2015-06-30T09:13:28.000Z</published>
+    <updated>2015-07-01T14:53:25.699Z</updated>
+    <content type="html"><![CDATA[<h3 id="引言">引言</h3><p>本文首先简单介绍Factory Method 模式，然后尝试提供Factory Method模式的一种PHP实现。</p>
+<h3 id="意图">意图</h3><p>工厂方法模式定义一个用于创建对象的接口，让子类决定实例化哪一个类。使得一个类的实例化过程延迟到了其子类。<br>许多类型的对象创建都需要一系列的步骤，比如说：</p>
+<ul>
+<li>可能需要计算或取得对象的初始位置</li>
+<li>可能需要选择生成哪个子对象的实例</li>
+<li>可能需要在对象生成之前必须先生成一些辅助功能的对象</li>
+</ul>
+<p>类似这种对象的创建，其实是一个“过程”，而不是一个简单的new操作。<br>把所有的这些对象创建的过程都封装起来，然后返回一个所需要的新类，这也许就是工厂方法的本质所在。<br>因此简单的来说工厂方法的职责就是“生产”对象。</p>
+<h3 id="适用场景">适用场景</h3><ul>
+<li>当一个类不知道它所必须创建的对象的类的时候</li>
+<li>当一个类希望由它的子类来制定它所创建的对象的时候</li>
+<li>当类将创建对象的职责委托给多个子类中的某一个，并且希望将哪一个子类是代理者这一信息局部化的时候。</li>
+</ul>
+<h3 id="简单实现">简单实现</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"><span class="comment">//Creator依赖于它的子类来定义工厂方法，</span></span><br><span class="line"><span class="comment">//所以它返回一个适当的ConcretProduct实例</span></span><br><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">Creator</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">FactoryMethod</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConcreteCreator</span> <span class="keyword">implements</span> <span class="title">Creator</span> </span>&#123;</span><br><span class="line">    <span class="comment">//实现工厂方法，来创建并返回具体的对象</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">FactoryMethod</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ConcreteProduct();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">Product</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">operation</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//实现不同的产品类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConcreteProduct</span> <span class="keyword">implements</span> <span class="title">Product</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">operation</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">"Product Created\n"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Client</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="function"><span class="keyword">function</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="variable">$creator</span> = <span class="keyword">new</span> ConcreteCreator();</span><br><span class="line">        <span class="variable">$product</span> = <span class="variable">$creator</span>-&gt;FactoryMethod();</span><br><span class="line">        <span class="variable">$product</span>-&gt;operation();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Client::main();</span><br><span class="line"></span><br><span class="line"><span class="comment">//Output:</span></span><br><span class="line"><span class="comment">//Product Created</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>本文仅为个人学习笔记整理，如有纰漏之处，欢迎指正-:)</p>
+</blockquote>
+<p>—EOF—</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<h3 id="引言">引言</h3><p>本文首先简单介绍Factory Method 模式，然后尝试提供Factory Method模式的一种PHP实现。</p>
+<h3 id="意图">意图</h3><p>工厂方法模式定义一个用于创建对象的接口，让子类决定实例化哪一个类。使]]>
+    </summary>
+    
+      <category term="Design Pattern" scheme="http://fengcode.com/tags/Design-Pattern/"/>
+    
+      <category term="PHP" scheme="http://fengcode.com/tags/PHP/"/>
+    
+      <category term="PHP" scheme="http://fengcode.com/categories/PHP/"/>
+    
+      <category term="Design Pattern" scheme="http://fengcode.com/categories/PHP/Design-Pattern/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[how php foreach actually works]]></title>
+    <link href="http://fengcode.com/2015/06/26/how-php-foreach-actually-works/"/>
+    <id>http://fengcode.com/2015/06/26/how-php-foreach-actually-works/</id>
+    <published>2015-06-26T13:50:21.000Z</published>
+    <updated>2015-07-01T14:48:34.461Z</updated>
+    <content type="html"></content>
+    <summary type="html">
+    
+    </summary>
+    
+      <category term="PHP" scheme="http://fengcode.com/tags/PHP/"/>
+    
+      <category term="PHP" scheme="http://fengcode.com/categories/PHP/"/>
+    
+  </entry>
   
   <entry>
     <title><![CDATA[记一次问题的解决]]></title>
