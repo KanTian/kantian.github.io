@@ -57,14 +57,16 @@
   </entry>
   
   <entry>
-    <title><![CDATA[how php foreach actually works]]></title>
+    <title><![CDATA[浅谈PHP foreach 工作原理]]></title>
     <link href="http://fengcode.com/2015/06/26/how-php-foreach-actually-works/"/>
     <id>http://fengcode.com/2015/06/26/how-php-foreach-actually-works/</id>
     <published>2015-06-26T13:50:21.000Z</published>
-    <updated>2015-07-01T14:48:34.461Z</updated>
-    <content type="html"></content>
+    <updated>2015-07-01T15:00:02.951Z</updated>
+    <content type="html"><![CDATA[<h3 id="引言">引言</h3><p>TODO</p>
+]]></content>
     <summary type="html">
-    
+    <![CDATA[<h3 id="引言">引言</h3><p>TODO</p>
+]]>
     </summary>
     
       <category term="PHP" scheme="http://fengcode.com/tags/PHP/"/>
