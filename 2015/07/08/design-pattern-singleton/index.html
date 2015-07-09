@@ -47,7 +47,7 @@
 
 
 
-  <title> PHP设计模式笔记--工厂方法(Facroty Method) // kantian's Notes </title>
+  <title> PHP设计模式笔记--单例模式(Singleton) // kantian's Notes </title>
 </head>
 
 <body>
@@ -160,7 +160,7 @@
           
           
             
-              PHP设计模式笔记--工厂方法(Facroty Method)
+              PHP设计模式笔记--单例模式(Singleton)
             
           
         </h1>
@@ -168,7 +168,7 @@
 
       <div class="post-meta">
         <span class="post-time">
-          发表于 2015-06-30
+          发表于 2015-07-08
         </span>
 
         
@@ -196,8 +196,8 @@
           
             <span class="post-comments-count">
             &nbsp; | &nbsp;
-            <a href="/2015/06/30/design-pattern-factory-method/#comments" >
-              <span class="post-comments-count ds-thread-count" data-thread-key="2015/06/30/design-pattern-factory-method/"></span>
+            <a href="/2015/07/08/design-pattern-singleton/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2015/07/08/design-pattern-singleton/"></span>
             </a>
           </span>
           
@@ -211,22 +211,20 @@
       
 
       
-        <h3 id="引言">引言</h3><p>本文首先简单介绍Factory Method 模式，然后尝试提供Factory Method模式的一种PHP实现。</p>
-<h3 id="意图">意图</h3><p>工厂方法模式定义一个用于创建对象的接口，让子类决定实例化哪一个类。使得一个类的实例化过程延迟到了其子类。<br>许多类型的对象创建都需要一系列的步骤，比如说：</p>
+        <h3 id="引言">引言</h3><p>本文首先简单介绍单例模式，然后尝试提供一种单例模式的PHP实现示例。</p>
+<h3 id="意图">意图</h3><p>保证一个类仅有一个实例，并提供一个访问它的全局访问点。</p>
+<h3 id="适用场景">适用场景</h3><p>在很多时候保证一个类只有一个实例是非常有必要的，在以下情况下我们应当使用Singleton模式：</p>
 <ul>
-<li>可能需要计算或取得对象的初始位置</li>
-<li>可能需要选择生成哪个子对象的实例</li>
-<li>可能需要在对象生成之前必须先生成一些辅助功能的对象</li>
+<li>当类只能有一个实例而且客户端只能通过该类所提供的某个特定方法才能访问它时;</li>
+<li>当这个唯一实例应该是通过子类化可扩展的，并且客户应该无需代码就能使用一个扩展的实例时;</li>
 </ul>
-<p>类似这种对象的创建，其实是一个“过程”，而不是一个简单的new操作。<br>把所有的这些对象创建的过程都封装起来，然后返回一个所需要的新类，这也许就是工厂方法的本质所在。<br>因此简单的来说工厂方法的职责就是“生产”对象。</p>
-<h3 id="适用场景">适用场景</h3><ul>
-<li>当一个类不知道它所必须创建的对象的类的时候</li>
-<li>当一个类希望由它的子类来制定它所创建的对象的时候</li>
-<li>当类将创建对象的职责委托给多个子类中的某一个，并且希望将哪一个子类是代理者这一信息局部化的时候。</li>
-</ul>
-<h3 id="结构">结构</h3><p><img src="/img/factory_method.png" alt="工厂方法结构图"></p>
-<h3 id="简单实现">简单实现</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"><span class="comment">//Creator依赖于它的子类来定义工厂方法，</span></span><br><span class="line"><span class="comment">//所以它返回一个适当的ConcretProduct实例</span></span><br><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">Creator</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">FactoryMethod</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConcreteCreator</span> <span class="keyword">implements</span> <span class="title">Creator</span> </span>&#123;</span><br><span class="line">    <span class="comment">//实现工厂方法，来创建并返回具体的对象</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">FactoryMethod</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ConcreteProduct();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">Product</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">operation</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//实现不同的产品类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConcreteProduct</span> <span class="keyword">implements</span> <span class="title">Product</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">operation</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">"Product Created\n"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Client</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="function"><span class="keyword">function</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="variable">$creator</span> = <span class="keyword">new</span> ConcreteCreator();</span><br><span class="line">        <span class="variable">$product</span> = <span class="variable">$creator</span>-&gt;FactoryMethod();</span><br><span class="line">        <span class="variable">$product</span>-&gt;operation();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Client::main();</span><br><span class="line"></span><br><span class="line"><span class="comment">//Output:</span></span><br><span class="line"><span class="comment">//Product Created</span></span><br></pre></td></tr></table></figure>
+<h3 id="结构">结构</h3><p><img src="/img/singleton.png" alt="Singleton模式结构图"></p>
+<h3 id="代码实现">代码实现</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Singleton</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="variable">$instance</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//返回实例</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="function"><span class="keyword">function</span> <span class="title">getInstance</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(<span class="keyword">NULL</span> == <span class="keyword">self</span>::<span class="variable">$instance</span>)&#123;</span><br><span class="line">            <span class="keyword">self</span>::<span class="variable">$instance</span> = <span class="keyword">new</span> <span class="keyword">static</span>();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">self</span>::<span class="variable">$instance</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//构造函数声明为protected</span></span><br><span class="line">    <span class="comment">//防止在类以外通过new关键字来创建对象</span></span><br><span class="line">    <span class="keyword">private</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">()</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//防止对象被拷贝</span></span><br><span class="line">    <span class="keyword">private</span> <span class="function"><span class="keyword">function</span> <span class="title">__clone</span><span class="params">()</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//防止被序列化</span></span><br><span class="line">    <span class="keyword">private</span> <span class="function"><span class="keyword">function</span> <span class="title">__wakeup</span><span class="params">()</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SingletonSub</span> <span class="keyword">extends</span> <span class="title">Singleton</span></span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Client</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="function"><span class="keyword">function</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="variable">$singleton</span> = Singleton::getInstance();</span><br><span class="line">        <span class="comment">/*</span><br><span class="line">            == checks if equivalent (value only)</span><br><span class="line">            === checks if the same (value &amp;&amp; type) </span><br><span class="line">        */</span></span><br><span class="line">        var_dump(<span class="variable">$singleton</span> === Singleton::getInstance());</span><br><span class="line"></span><br><span class="line">        <span class="variable">$ano_singleton</span> = SingletonSub::getInstance();</span><br><span class="line">        var_dump(<span class="variable">$ano_singleton</span> === SingletonSub::getInstance());</span><br><span class="line"></span><br><span class="line">        var_dump(<span class="variable">$ano_singleton</span> === Singleton::getInstance());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Client::main();</span><br><span class="line"></span><br><span class="line"><span class="comment">//Output</span></span><br><span class="line"><span class="comment">/*</span><br><span class="line">bool(true)</span><br><span class="line">bool(true)</span><br><span class="line">bool(true) ??</span><br><span class="line">*/</span></span><br></pre></td></tr></table></figure>
 <blockquote>
+<p>这里除了定义getInstance函数外，还需要特别注意<strong>construct(),</strong>clone(),以及__wakeup() 函数的声明。<br>因为只有严格控制类的访问，才能达到<code>对唯一实例的受控访问</code>目的。</p>
+</blockquote>
+<h3 id="相关模式">相关模式</h3><p>在实际应用中,Singleton会经常使用到，比如说数据库 PDO 的访问对象，通常会是设计成单例的。<br>比如在游戏中的主角，如笔者之前开发的类Flappy Bird游戏<a href="https://github.com/OiteBoys/Earlybird" target="_blank" rel="external">EarlyBird</a>中的小鸟类就是设计成了单例</p>
+<h3 id="后记">后记</h3><blockquote>
 <p>本文仅为个人学习笔记整理，如有纰漏之处，欢迎指正-:)</p>
 </blockquote>
 <p>—EOF—</p>
@@ -249,13 +247,11 @@
         <div class="post-nav">
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2015/07/02/design-pattern-abstract-factory/">PHP设计模式笔记--抽象工厂(Abstract Factory)</a>
-            
           </div>
 
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2015/06/26/how-php-foreach-actually-works/">浅谈PHP foreach 工作原理</a>
+              <a href="/2015/07/04/design-pattern-prototype/">PHP设计模式笔记--原型模式(Prototype)</a>
             
           </div>
         </div>
@@ -273,8 +269,8 @@
     
       <div class="comments" id="comments">
         
-          <div class="ds-thread" data-thread-key="2015/06/30/design-pattern-factory-method/"
-               data-title="PHP设计模式笔记--工厂方法(Facroty Method)" data-url="http://fengcode.com/2015/06/30/design-pattern-factory-method/">
+          <div class="ds-thread" data-thread-key="2015/07/08/design-pattern-singleton/"
+               data-title="PHP设计模式笔记--单例模式(Singleton)" data-url="http://fengcode.com/2015/07/08/design-pattern-singleton/">
           </div>
         
       </div>
@@ -378,7 +374,7 @@
           <div class="post-toc">
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#引言"><span class="nav-number">1.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#意图"><span class="nav-number">2.</span> <span class="nav-text">意图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#适用场景"><span class="nav-number">3.</span> <span class="nav-text">适用场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#结构"><span class="nav-number">4.</span> <span class="nav-text">结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#简单实现"><span class="nav-number">5.</span> <span class="nav-text">简单实现</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#引言"><span class="nav-number">1.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#意图"><span class="nav-number">2.</span> <span class="nav-text">意图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#适用场景"><span class="nav-number">3.</span> <span class="nav-text">适用场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#结构"><span class="nav-number">4.</span> <span class="nav-text">结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代码实现"><span class="nav-number">5.</span> <span class="nav-text">代码实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#相关模式"><span class="nav-number">6.</span> <span class="nav-text">相关模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#后记"><span class="nav-number">7.</span> <span class="nav-text">后记</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>
