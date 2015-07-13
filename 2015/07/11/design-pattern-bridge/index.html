@@ -22,7 +22,7 @@
 
 
 
-  <meta name="keywords" content="Hexo,next" />
+  <meta name="keywords" content="Design Pattern,PHP," />
 
 
 
@@ -47,7 +47,7 @@
 
 
 
-  <title> Hello World // eDeng's Notes </title>
+  <title> PHP设计模式笔记--桥接模式(Bridge) // eDeng's Notes </title>
 </head>
 
 <body>
@@ -160,7 +160,7 @@
           
           
             
-              Hello World
+              PHP设计模式笔记--桥接模式(Bridge)
             
           
         </h1>
@@ -168,17 +168,36 @@
 
       <div class="post-meta">
         <span class="post-time">
-          发表于 2015-01-01
+          发表于 2015-07-11
         </span>
 
+        
+          <span class="post-category">
+            &nbsp; | &nbsp; 分类于
+            
+              <a href="/categories/PHP/">PHP</a>
+
+              
+              
+                ， 
+              
+
+            
+              <a href="/categories/PHP/Design-Pattern/">Design Pattern</a>
+
+              
+              
+
+            
+          </span>
         
 
         
           
             <span class="post-comments-count">
             &nbsp; | &nbsp;
-            <a href="/2015/01/01/hello-world/#comments" >
-              <span class="post-comments-count ds-thread-count" data-thread-key="2015/01/01/hello-world/"></span>
+            <a href="/2015/07/11/design-pattern-bridge/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2015/07/11/design-pattern-bridge/"></span>
             </a>
           </span>
           
@@ -192,31 +211,48 @@
       
 
       
-        <p>Welcome to <a href="http://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="http://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="http://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
-<h2 id="Quick_Start">Quick Start</h2><h3 id="Create_a_new_post">Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-<p>More info: <a href="http://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
-<h3 id="Run_server">Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="http://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
-<h3 id="Generate_static_files">Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="http://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
-<h3 id="Deploy_to_remote_sites">Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="http://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
+        <h3 id="引言">引言</h3><p>本文首先简单介绍桥接(Bridge)模式，然后尝试提供一种桥接(Bridge)模式的PHP实现示例。</p>
+<h3 id="意图">意图</h3><p>将抽象部分与它的实现部分分离，使它们都可以独立地变化。</p>
+<blockquote>
+<p>这里的<strong>实现</strong>的含义不是指抽象基类的具体子类对抽象基类中的抽象函数（接口）进行实现，而是和继承结合在一起。<br>这里的<strong>实现</strong>指的是怎么去实现用户的需求，并且指的是通过组合（委托）的方式实现的，因此这里的<strong>实现</strong>不是指继承基类、实现基类接口，而是指通过对象组合实现用户的需求。</p>
+</blockquote>
+<h3 id="适用场景">适用场景</h3><ul>
+<li>不希望在抽象和它的实现部分之间有一个固定的绑定关系。</li>
+<li>类的抽象以及它的实现都应该可以通过生成子类的方法加以扩充。通过使用Bridge模式对不同的抽象接口和实现部分进行组合，并分别对它们进行扩充。</li>
+<li>…</li>
+</ul>
+<h3 id="结构">结构</h3><p><img src="/img/bridge.png" alt="Bridge模式结构图"></p>
+<h3 id="代码实现">代码实现</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Abstraction</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">Operation</span><span class="params">()</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//可以认为RefinedAbstraction 起到了桥梁的作用，</span></span><br><span class="line"><span class="comment">//它把Operation的定义 和 Operation的具体实现连接了起来</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">RefinedAbstraction</span> <span class="keyword">extends</span> <span class="title">Abstraction</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="variable">$_imp</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">(<span class="variable">$abs_imp</span>)</span></span>&#123;</span><br><span class="line">        <span class="variable">$this</span>-&gt;_imp = <span class="variable">$abs_imp</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">Operation</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="variable">$this</span>-&gt;_imp-&gt;Operation();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AbstractionImp</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">Operation</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">"AbstractionImp::Operation()\n"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConcreteAbstractionImpA</span> <span class="keyword">extends</span> <span class="title">AbstractionImp</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">Operation</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">"ConcreteAbstractionImpA::Operation()\n"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConcreteAbstractionImpB</span> <span class="keyword">extends</span> <span class="title">AbstractionImp</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">Operation</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">"ConcreteAbstractionImpB::Operation()\n"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Client</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="function"><span class="keyword">function</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="variable">$c_A</span> = <span class="keyword">new</span> ConcreteAbstractionImpA();</span><br><span class="line">        <span class="variable">$r_bs</span> = <span class="keyword">new</span> RefinedAbstraction(<span class="variable">$c_A</span>);</span><br><span class="line">        <span class="variable">$r_bs</span>-&gt;Operation();</span><br><span class="line"></span><br><span class="line">        <span class="variable">$c_B</span> = <span class="keyword">new</span> ConcreteAbstractionImpB();</span><br><span class="line">        <span class="variable">$r_bs</span> = <span class="keyword">new</span> RefinedAbstraction(<span class="variable">$c_B</span>);</span><br><span class="line">        <span class="variable">$r_bs</span>-&gt;Operation();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Client::main();</span><br><span class="line"></span><br><span class="line"><span class="comment">//Output</span></span><br><span class="line"><span class="comment">/**</span><br><span class="line">$ php bridge.php</span><br><span class="line">ConcreteAbstractionImpA::Operation()</span><br><span class="line">ConcreteAbstractionImpB::Operation()</span><br><span class="line">*/</span></span><br></pre></td></tr></table></figure>
+<h3 id="相关模式">相关模式</h3><p>Bridge是设计模式中比较复杂和难理解的模式之一，也是OO开发与设计中经常会用到的模式之一。使用组合（委托）的方式将抽象和实现彻底地解耦，这样的好处是抽象和实现可以分别独立地变化，系统的耦合性也得到了很好的降低。</p>
+<h3 id="参考资料">参考资料</h3><p>设计模式-可复用面向对象软件的基础  GoF<br><a href="http://www.mscenter.edu.cn/blog/k_eckel" target="_blank" rel="external">设计模式精解－GoF 23种设计模式解析</a></p>
+<h3 id="后记">后记</h3><blockquote>
+<p>本文仅为个人学习笔记整理，如有纰漏之处，欢迎指正-:)</p>
+</blockquote>
+<p>—EOF—</p>
 
       
     </div>
 
     <div class="post-footer">
       
+        <div class="post-tags">
+          
+            <a href="/tags/Design-Pattern/"> #Design Pattern </a>
+          
+            <a href="/tags/PHP/"> #PHP </a>
+          
+        </div>
+      
 
       
         <div class="post-nav">
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2015/01/24/mysql-crash-course-1/">MySQL 知识点整理一</a>
-            
           </div>
 
           <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/07/10/design-pattern-adapter/">PHP设计模式笔记--适配器模式(Adapter)</a>
             
           </div>
         </div>
@@ -234,8 +270,8 @@
     
       <div class="comments" id="comments">
         
-          <div class="ds-thread" data-thread-key="2015/01/01/hello-world/"
-               data-title="Hello World" data-url="http://fengcode.com/2015/01/01/hello-world/">
+          <div class="ds-thread" data-thread-key="2015/07/11/design-pattern-bridge/"
+               data-title="PHP设计模式笔记--桥接模式(Bridge)" data-url="http://fengcode.com/2015/07/11/design-pattern-bridge/">
           </div>
         
       </div>
@@ -339,7 +375,7 @@
           <div class="post-toc">
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Quick_Start"><span class="nav-number">1.</span> <span class="nav-text">Quick Start</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Create_a_new_post"><span class="nav-number">1.1.</span> <span class="nav-text">Create a new post</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Run_server"><span class="nav-number">1.2.</span> <span class="nav-text">Run server</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Generate_static_files"><span class="nav-number">1.3.</span> <span class="nav-text">Generate static files</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Deploy_to_remote_sites"><span class="nav-number">1.4.</span> <span class="nav-text">Deploy to remote sites</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#引言"><span class="nav-number">1.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#意图"><span class="nav-number">2.</span> <span class="nav-text">意图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#适用场景"><span class="nav-number">3.</span> <span class="nav-text">适用场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#结构"><span class="nav-number">4.</span> <span class="nav-text">结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代码实现"><span class="nav-number">5.</span> <span class="nav-text">代码实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#相关模式"><span class="nav-number">6.</span> <span class="nav-text">相关模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">7.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#后记"><span class="nav-number">8.</span> <span class="nav-text">后记</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>
