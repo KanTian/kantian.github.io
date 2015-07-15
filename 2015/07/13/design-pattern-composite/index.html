@@ -47,7 +47,7 @@
 
 
 
-  <title> PHP设计模式笔记--适配器模式(Adapter) // eDeng's Notes </title>
+  <title> PHP设计模式笔记--组合模式(Composite) // eDeng's Notes </title>
 </head>
 
 <body>
@@ -160,7 +160,7 @@
           
           
             
-              PHP设计模式笔记--适配器模式(Adapter)
+              PHP设计模式笔记--组合模式(Composite)
             
           
         </h1>
@@ -168,7 +168,7 @@
 
       <div class="post-meta">
         <span class="post-time">
-          发表于 2015-07-10
+          发表于 2015-07-13
         </span>
 
         
@@ -196,8 +196,8 @@
           
             <span class="post-comments-count">
             &nbsp; | &nbsp;
-            <a href="/2015/07/10/design-pattern-adapter/#comments" >
-              <span class="post-comments-count ds-thread-count" data-thread-key="2015/07/10/design-pattern-adapter/"></span>
+            <a href="/2015/07/13/design-pattern-composite/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2015/07/13/design-pattern-composite/"></span>
             </a>
           </span>
           
@@ -211,25 +211,19 @@
       
 
       
-        <h3 id="引言">引言</h3><p>本文首先简单介绍适配器(Adapter)模式，然后尝试提供一种适配器(Adapter)模式的PHP实现示例。</p>
-<h3 id="意图">意图</h3><p>将一个类的接口转换成客户希望的另外一个接口。<br>Adapter模式使得原本由于接口不兼容而不能工作的那些类可以一起工作。</p>
-<p><code>解决了由于接口不匹配而导致的接口不能复用的问题</code></p>
-<h3 id="适用场景">适用场景</h3><p>以下情况使用Adapter模式</p>
-<ul>
-<li>你想使用一个已经存在的类，而它的接口不符合你的需求。(最原始的哦需求)</li>
-<li>你想创建一个可以复用的类，该类可以与其他不相关的类或不可预见的类（即那些接口可能不一定兼容的类）协同工作。</li>
-<li>你想使用一些已经存在的子类，但是不可能对每一个都进行子类化以匹配它们的接口。对象适配器可以适配它的父类接口。</li>
+        <h3 id="引言">引言</h3><p>本文首先简单介绍组合(Composite)模式，然后尝试提供一种组合(Composite)模式的PHP实现示例。</p>
+<h3 id="意图">意图</h3><p>将对象组合成<strong>树形结构</strong>以表示“部分-整体”的层次结构。<br>Composite模式使得用户对单个对象和组合对象的使用具有一致性。</p>
+<h3 id="适用场景">适用场景</h3><ul>
+<li>想表示对象的“部分-整体”的层次结构</li>
+<li>希望用户忽略组合对象与单个对象的不同，用户将统一使用组合结构中的所有对象</li>
+<li>…</li>
 </ul>
-<h3 id="结构">结构</h3><p><img src="/img/adapter.png" alt="Adapter模式结构图"></p>
-<h3 id="代码实现">代码实现</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Target</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">Request</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">"Target::Request\n"</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Adaptee</span></span>&#123;</span><br><span class="line">    <span class="comment">//待适配的接口</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">SpecificRequest</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">"Adaptee::SpecificRequest"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//Adapter 继承自Target，但是通过Adaptee的对象对Request()方法进行了重新定义。</span></span><br><span class="line"><span class="comment">//使在Adapter中，第三方接口（Adaptee）跟本地接口（Target）得到了统一。</span></span><br><span class="line"><span class="comment">//相当于对Adaptee进行了包装(Wrapper),从而达到了接口适配和复用的目的。</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Adapter</span> <span class="keyword">extends</span> <span class="title">Target</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="variable">$_ade</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">(<span class="variable">$m_adaptee</span>)</span></span>&#123;</span><br><span class="line">        <span class="variable">$this</span>-&gt;_ade = <span class="variable">$m_adaptee</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">Request</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="variable">$this</span>-&gt;_ade-&gt;SpecificRequest();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Client</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="function"><span class="keyword">function</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="variable">$m_adaptee</span> = <span class="keyword">new</span> Adaptee();</span><br><span class="line">        <span class="variable">$m_adapter</span> = <span class="keyword">new</span> Adapter(<span class="variable">$m_adaptee</span>);</span><br><span class="line">        <span class="variable">$m_adapter</span>-&gt;Request();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Client::main();</span><br><span class="line"></span><br><span class="line"><span class="comment">//Output:</span></span><br><span class="line"><span class="comment">/*</span><br><span class="line">    Adaptee::SpecificRequest</span><br><span class="line">*/</span></span><br></pre></td></tr></table></figure>
+<h3 id="结构">结构</h3><p><img src="/img/composite.png" alt="Composite模式结构图"></p>
+<h3 id="代码实现">代码实现</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"><span class="comment">//提供用户统一接口，</span></span><br><span class="line"><span class="comment">//可以理解为（树形结构节点对外提供的统一接口，可以实现节点的公共缺省操作）</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Component</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">Operation</span><span class="params">()</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">Add</span><span class="params">(<span class="variable">$component</span>)</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">Remove</span><span class="params">(<span class="variable">$component</span>)</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">GetChild</span><span class="params">(<span class="variable">$index</span>)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//负责管理组合对象的组件，可以理解为（树形结构的非叶子节点）</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Composite</span> <span class="keyword">extends</span> <span class="title">Component</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">Operation</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">foreach</span> (<span class="variable">$this</span>-&gt;component_array <span class="keyword">as</span> <span class="variable">$key</span> =&gt; <span class="variable">$item</span>) &#123;</span><br><span class="line">            <span class="variable">$item</span>-&gt;Operation();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">Add</span><span class="params">(<span class="variable">$component</span>)</span></span>&#123;</span><br><span class="line">        <span class="variable">$this</span>-&gt;component_array[] = <span class="variable">$component</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">Remove</span><span class="params">(<span class="variable">$component</span>)</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(<span class="variable">$key</span> = array_search(<span class="variable">$component</span>,<span class="variable">$this</span>-&gt;component_array) !== <span class="keyword">FALSE</span>)&#123;</span><br><span class="line">            <span class="keyword">unset</span>(<span class="variable">$this</span>-&gt;component_array[<span class="variable">$key</span>]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">GetChild</span><span class="params">(<span class="variable">$index</span>)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="variable">$this</span>-&gt;component_array[<span class="variable">$index</span>];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//对子节点Leaf的管理</span></span><br><span class="line">    <span class="keyword">private</span> <span class="variable">$component_array</span> = <span class="keyword">array</span>();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//待组合的对象（树形结构的叶子节点）</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Leaf</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">Operation</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">"Leaf Operation ...\n"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Client</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="function"><span class="keyword">function</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="variable">$m_leaf</span> = <span class="keyword">new</span> Leaf();</span><br><span class="line">        <span class="variable">$m_leaf</span>-&gt;Operation();</span><br><span class="line"></span><br><span class="line">        <span class="variable">$m_composite</span> = <span class="keyword">new</span> Composite();</span><br><span class="line">        <span class="variable">$m_composite</span>-&gt;Add(<span class="variable">$m_leaf</span>);</span><br><span class="line">        <span class="variable">$m_composite</span>-&gt;Operation();</span><br><span class="line"></span><br><span class="line">        <span class="variable">$m_component</span> = <span class="variable">$m_composite</span>-&gt;GetChild(<span class="number">0</span>);</span><br><span class="line">        <span class="variable">$m_component</span>-&gt;Operation();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Client::main();</span><br><span class="line"></span><br><span class="line"><span class="comment">//Output</span></span><br><span class="line"><span class="comment">/*</span><br><span class="line">$ php composite.php</span><br><span class="line">Leaf Operation ...</span><br><span class="line">Leaf Operation ...</span><br><span class="line">Leaf Operation ...</span><br><span class="line">*/</span></span><br></pre></td></tr></table></figure>
 <h3 id="相关模式">相关模式</h3><blockquote>
-<ul>
-<li>Bridge模式的结构与对象适配器类似，但是Bridge模式的出发点不同：Bridge目的是将接口部分和实现部分分离，从而对它们可以较为容易也相对独立的加以改变。而Adapter则意味着改变一个已有对象的接口。</li>
-<li>Decorator模式增强了其他对象的功能而同时又不改变它的接口。因此Decorator对应用程序的透明性比适配器要好。结果是Decorator支持递归组合，而纯粹使用适配器是不可能实现这一点的。</li>
-<li>Proxy模式在不改变它的接口的条件下，为另一个对象定义了一个代理。</li>
-</ul>
+<p>Composite模式通过和Decorator模式有着类似的结构图，但是Composite模式旨在构造类，而Decorator模式重在不生成子类即可给对象添加职责。Decorator模式重在修饰，而Composite模式重在表示。</p>
 </blockquote>
-<h3 id="参考资料">参考资料</h3><p>设计模式-可复用面向对象软件的基础  GoF</p>
+<h3 id="参考资料">参考资料</h3><p>设计模式-可复用面向对象软件的基础  GoF<br><a href="http://www.mscenter.edu.cn/blog/k_eckel" target="_blank" rel="external">设计模式精解－GoF 23种设计模式解析</a></p>
 <h3 id="后记">后记</h3><blockquote>
 <p>本文仅为个人学习笔记整理，如有纰漏之处，欢迎指正-:)</p>
 </blockquote>
@@ -253,13 +247,11 @@
         <div class="post-nav">
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2015/07/11/design-pattern-bridge/">PHP设计模式笔记--桥接模式(Bridge)</a>
-            
           </div>
 
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2015/07/08/design-pattern-singleton/">PHP设计模式笔记--单例模式(Singleton)</a>
+              <a href="/2015/07/11/design-pattern-bridge/">PHP设计模式笔记--桥接模式(Bridge)</a>
             
           </div>
         </div>
@@ -277,8 +269,8 @@
     
       <div class="comments" id="comments">
         
-          <div class="ds-thread" data-thread-key="2015/07/10/design-pattern-adapter/"
-               data-title="PHP设计模式笔记--适配器模式(Adapter)" data-url="http://fengcode.com/2015/07/10/design-pattern-adapter/">
+          <div class="ds-thread" data-thread-key="2015/07/13/design-pattern-composite/"
+               data-title="PHP设计模式笔记--组合模式(Composite)" data-url="http://fengcode.com/2015/07/13/design-pattern-composite/">
           </div>
         
       </div>
