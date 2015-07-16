@@ -47,7 +47,7 @@
 
 
 
-  <title> PHP设计模式笔记--原型模式(Prototype) // eDeng's Notes </title>
+  <title> PHP设计模式笔记--装饰模式(Decorator) // eDeng's Notes </title>
 </head>
 
 <body>
@@ -160,7 +160,7 @@
           
           
             
-              PHP设计模式笔记--原型模式(Prototype)
+              PHP设计模式笔记--装饰模式(Decorator)
             
           
         </h1>
@@ -168,7 +168,7 @@
 
       <div class="post-meta">
         <span class="post-time">
-          发表于 2015-07-04
+          发表于 2015-07-15
         </span>
 
         
@@ -196,8 +196,8 @@
           
             <span class="post-comments-count">
             &nbsp; | &nbsp;
-            <a href="/2015/07/04/design-pattern-prototype/#comments" >
-              <span class="post-comments-count ds-thread-count" data-thread-key="2015/07/04/design-pattern-prototype/"></span>
+            <a href="/2015/07/15/design-pattern-decorator/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2015/07/15/design-pattern-decorator/"></span>
             </a>
           </span>
           
@@ -211,23 +211,37 @@
       
 
       
-        <h3 id="引言">引言</h3><p>本文首先简单介绍原型模式，然后尝试提供一种原型模式的PHP实现。</p>
-<h3 id="意图">意图</h3><p>用原型实例指定创建对象的种类，并且通过拷贝这些原型创建新的对象。<br>原型模式主要用于对象的复制。</p>
-<h3 id="适用场景">适用场景</h3><p>当一个系统应该独立于它的产品创建、构成和表示时，要使用Prototype模式；以及</p>
-<ul>
-<li>当要实例化的类是在运行时刻指定时；</li>
-<li>当需要为了避免创建一个与产品类层次平行的工厂类层次时；</li>
-<li>当一个类的实例只能有几个不同状态组合中的一种时，建立相应数目的原型并克隆它们可能比每次用合适的状态手工实例化更方便一些。</li>
+        <h3 id="引言">引言</h3><p>本文首先简单介绍装饰(Decorator)模式，然后尝试提供一种装饰(Decorator)模式的PHP实现示例。</p>
+<h3 id="意图">意图</h3><p>动态地给一个对象添加一些额外职责。就新增加功能来说，Decorator模式相比生成子类更为灵活。</p>
+<blockquote>
+<p>Decorator模式不是通过继承实现扩展，而是通过组合来实现扩展。</p>
+</blockquote>
+<h3 id="适用场景">适用场景</h3><ul>
+<li>在不影响其他对象的情况下，以动态、透明的方式给单个对象添加职责。</li>
+<li>处理那些可以撤销的职责</li>
+<li>当不能采用生产子类的方法进行扩充时。<ul>
+<li>一种情况是，可能有大量独立的扩展，为支持每一种组合将产生大量的子类，使得子类的数目呈爆炸性增长。</li>
+<li>另一种情况是，类的定义被隐藏，或类定义不能用于生成子类。</li>
 </ul>
-<h3 id="结构">结构</h3><p><img src="/img/prototype.png" alt="Prototype模式结构图"></p>
-<h3 id="代码实现">代码实现</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Prototype</span></span>&#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="variable">$instances_cnt</span> = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$instance_cnt</span>;</span><br><span class="line">    <span class="comment">//拷贝的过程当中，会执行__construct() 和 _clone()</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="variable">$this</span>-&gt;instance_cnt = ++<span class="keyword">self</span>::<span class="variable">$instances_cnt</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__clone</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="variable">$this</span>-&gt;instance_cnt = ++<span class="keyword">self</span>::<span class="variable">$instances_cnt</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">myclone</span><span class="params">()</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">operation</span><span class="params">()</span></span>&#123;</span><br><span class="line">       <span class="comment">// echo 'instance_cnt '.$this-&gt;instance_cnt;</span></span><br><span class="line">      <span class="comment">//  echo 'instances_cnt '.self::$instances_cnt;</span></span><br><span class="line">        <span class="keyword">echo</span> <span class="string">"hi\n"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConcretePrototype</span> <span class="keyword">extends</span> <span class="title">Prototype</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="variable">$instance</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="variable">$this</span>-&gt;instance = <span class="keyword">new</span> Prototype();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//clone 当前对象并且返回</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">myclone</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">clone</span> <span class="variable">$this</span>-&gt;instance;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">operation</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">"Hi\n"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Client</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="function"><span class="keyword">function</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="variable">$c_prototype</span> = <span class="keyword">new</span> ConcretePrototype();</span><br><span class="line">        <span class="variable">$m_prototype</span> = <span class="variable">$c_prototype</span>-&gt;myclone();</span><br><span class="line">        <span class="variable">$m_prototype</span>-&gt;operation();</span><br><span class="line">        <span class="variable">$n_prototype</span> = <span class="variable">$c_prototype</span>-&gt;myclone();</span><br><span class="line">        <span class="variable">$n_prototype</span>-&gt;operation();</span><br><span class="line">    &#125;   </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Client::main();</span><br><span class="line"></span><br><span class="line"><span class="comment">//output</span></span><br><span class="line"><span class="comment">/*</span><br><span class="line">hi</span><br><span class="line">hi</span><br><span class="line"></span><br><span class="line">*/</span></span><br></pre></td></tr></table></figure>
-<h3 id="相关模式">相关模式</h3><p>Prototype 模式通过复制原型而达到创建新对象的功能，而PHP原生的clone() 方法让这一特性得以很方便的实现。<br>实际上Prototype、Builder和Abstract Factory模式都是通过一个类来专门负责对象的创建。<br>只是区别在于：</p>
-<ul>
-<li>Builder模式侧重于复杂对象的一步步创建;</li>
-<li>Abstract Factory 模式侧重于生产队歌相互依赖类的对象;</li>
-<li>Prototype 模式侧重于从一个已有的对象，通过复制该对象来产生新的对象。</li>
+</li>
+<li>…</li>
 </ul>
-<h3 id="参考资料">参考资料</h3><p>设计模式-可复用面向对象软件的基础  GoF</p>
+<h3 id="结构">结构</h3><p><img src="/img/decorator.png" alt="Decorator模式结构图"></p>
+<ul>
+<li>Component : 定义对象接口，可以给这些对象动态地添加职责</li>
+<li>ComcreteComponent : 定义一个对象，可以给这个对象添加职责</li>
+<li>Decorator : 维持一个指向Component对象的指针，并定义一个与Component接口一直的接口。</li>
+<li>ConcreteDecorator : 向组件添加职责</li>
+</ul>
+<h3 id="代码实现">代码实现</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Component</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">Operation</span><span class="params">()</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConcreteComponent</span> <span class="keyword">extends</span> <span class="title">Component</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">Operation</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">"ConcreteComponent Operation...\n"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//Decorator 从 Component 继承的目的是为了保持跟Component的接口一致</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Decorator</span> <span class="keyword">extends</span> <span class="title">Component</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">(&amp;<span class="variable">$com</span>)</span></span>&#123;</span><br><span class="line">        <span class="variable">$this</span>-&gt;_component = <span class="variable">$com</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">Operation</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="variable">$this</span>-&gt;_component-&gt;Operation();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">protected</span> <span class="variable">$_component</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//为Component添加职责，并且通过公共接口实现职责</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConcreteDecorator</span> <span class="keyword">extends</span> <span class="title">Decorator</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">Operation</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="variable">$this</span>-&gt;_component-&gt;Operation();</span><br><span class="line">        <span class="variable">$this</span>-&gt;AddedBehavior();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//添加职责</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">AddedBehavior</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">"ConcreteDecorator::AddedBehavior\n"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Client</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="function"><span class="keyword">function</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="variable">$m_component</span> = <span class="keyword">new</span> ConcreteComponent();</span><br><span class="line">        <span class="comment">//指明对哪一个ConcreteComponent进行装饰</span></span><br><span class="line">        <span class="variable">$m_decorator</span> = <span class="keyword">new</span> ConcreteDecorator(<span class="variable">$m_component</span>);</span><br><span class="line">        <span class="comment">//装饰完之后的对象有着跟Component一样的接口，</span></span><br><span class="line">        <span class="comment">//但是此时它的职责已经发生变化了</span></span><br><span class="line">        <span class="variable">$m_decorator</span>-&gt;Operation();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Client::main();</span><br><span class="line"></span><br><span class="line"><span class="comment">//Output</span></span><br><span class="line"><span class="comment">/*</span><br><span class="line">$ php decorator.php</span><br><span class="line">ConcreteComponent Operation...</span><br><span class="line">ConcreteDecorator::AddedBehavior</span><br><span class="line">*/</span></span><br></pre></td></tr></table></figure>
+<h3 id="相关模式">相关模式</h3><ul>
+<li>咋一看，Decorator模式跟Composite模式有着相似之处，不过正如<a href="/2015/07/13/design-pattern-composite/">上篇</a>所述,Composite侧重于通过多个子组件的组合，构造一个新类，而Decorator模式则侧重于，对一个已有类的修饰，在不通过生成子类的情况下，通过Wrapper的方式给类添加一些职责。</li>
+<li>除此之外，Decorator模式跟<a href="">Proxy模式</a>也有相似之处，他们都拥有一个指向其他对象的指针。即通过组合的方式来为对象提供更多的操作。区别在于，Proxy模式会提供使用其作为代理的对象一样的接口，使用代理类将其操作委托给Proxy直接进行。</li>
+</ul>
+<blockquote>
+<p>相比较通过生成子类来添加职责的方式，如果要保证父子类的接口一致，那么在给子类添加新职责的过程当中，就必然需要在父类中添加同样的接口，这样必然导致父类变得异常臃肿。而Decorator 模式则为这种情况提供了一种很好的解决方法，当需要添加一个操作（职责）的时候可以在保证父类接口不变的情况下，一步步添加职责。</p>
+</blockquote>
+<h3 id="参考资料">参考资料</h3><p>设计模式-可复用面向对象软件的基础  GoF<br><a href="http://www.mscenter.edu.cn/blog/k_eckel" target="_blank" rel="external">设计模式精解－GoF 23种设计模式解析</a></p>
 <h3 id="后记">后记</h3><blockquote>
 <p>本文仅为个人学习笔记整理，如有纰漏之处，欢迎指正-:)</p>
 </blockquote>
@@ -251,13 +265,11 @@
         <div class="post-nav">
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2015/07/08/design-pattern-singleton/">PHP设计模式笔记--单例模式(Singleton)</a>
-            
           </div>
 
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2015/07/03/design-pattern-builder/">PHP设计模式笔记--生成器(Builder)</a>
+              <a href="/2015/07/13/design-pattern-composite/">PHP设计模式笔记--组合模式(Composite)</a>
             
           </div>
         </div>
@@ -275,8 +287,8 @@
     
       <div class="comments" id="comments">
         
-          <div class="ds-thread" data-thread-key="2015/07/04/design-pattern-prototype/"
-               data-title="PHP设计模式笔记--原型模式(Prototype)" data-url="http://fengcode.com/2015/07/04/design-pattern-prototype/">
+          <div class="ds-thread" data-thread-key="2015/07/15/design-pattern-decorator/"
+               data-title="PHP设计模式笔记--装饰模式(Decorator)" data-url="http://fengcode.com/2015/07/15/design-pattern-decorator/">
           </div>
         
       </div>
