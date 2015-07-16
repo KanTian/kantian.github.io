@@ -5,7 +5,7 @@
   <subtitle><![CDATA[技术是一场修行...]]></subtitle>
   <link href="/atom.xml" rel="self"/>
   <link href="http://fengcode.com//"/>
-  <updated>2015-07-16T04:12:35.141Z</updated>
+  <updated>2015-07-16T09:11:07.554Z</updated>
   <id>http://fengcode.com//</id>
   
   <author>
@@ -14,6 +14,58 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title><![CDATA[PHP设计模式笔记--代理模式(Proxy)]]></title>
+    <link href="http://fengcode.com/2015/07/16/design-pattern-proxy/"/>
+    <id>http://fengcode.com/2015/07/16/design-pattern-proxy/</id>
+    <published>2015-07-16T05:48:46.000Z</published>
+    <updated>2015-07-16T09:11:07.554Z</updated>
+    <content type="html"><![CDATA[<h3 id="引言">引言</h3><p>本文首先简单介绍代理(Proxy)模式，然后尝试提供一种代理(Proxy)模式的PHP实现示例。</p>
+<h3 id="意图">意图</h3><p>为其他对象提供一种代理，以控制对这个对象的访问。</p>
+<h3 id="适用场景">适用场景</h3><ol>
+<li>保护代理(Protection Proxy) 控制对原始对象的访问</li>
+<li>远程代理(Remote Proxy) 为一个对象在不同的地址空间提供局部代表</li>
+<li>虚代理(Virtual Proxy) 根据需要创建开销很大的对象</li>
+<li>智能指引(Smart Reference) 智能指针的实现，取代简单指针，在访问对象的时候执行一些附加操作</li>
+</ol>
+<hr>
+<p>代理(Proxy)模式在访问对象时引入了一定程度的间接性。根据代理的类型，附加的间接性有多种用途：</p>
+<ul>
+<li>远程代理(Remote Proxy) 可以隐藏一个对象存在于不同地址空间的事实</li>
+<li>虚代理(Virtual Proxy) 可以进行最优化，例如根据要求创建对象</li>
+<li>保护代理(Protection Proxies)和智能指引(Smart Reference)都允许在访问一个对象时有一些附加的内务处理(Housekeeping task)</li>
+</ul>
+<h3 id="结构">结构</h3><p><img src="/img/Proxy.png" alt="Proxy模式结构图"></p>
+<h3 id="代码实现">代码实现</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Subject</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">Request</span><span class="params">()</span></span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//真正执行的类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConcreteSubject</span> <span class="keyword">extends</span> <span class="title">Subject</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">Request</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">"ConcreteSubject::Request()\n"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Proxy</span> <span class="keyword">extends</span> <span class="title">Subject</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">(<span class="variable">$subject</span>)</span></span>&#123;</span><br><span class="line">        <span class="variable">$this</span>-&gt;_subject = <span class="variable">$subject</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//Proxy 接受Request请求，然后调用ConcreteRequest的Request去执行真正的操作</span></span><br><span class="line">    <span class="comment">//这里Proxy在真正调用ConcreteRequest的Request之前，还能够做一些其他的操作，</span></span><br><span class="line">    <span class="comment">//这部分工作也许正是代理的优势的真正体现之处了</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">Request</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">"Proxy::Request()\n"</span>;</span><br><span class="line">        <span class="variable">$this</span>-&gt;_subject-&gt;Request();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> <span class="variable">$_subject</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Client</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="function"><span class="keyword">function</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="variable">$m_concrete_subject</span> = <span class="keyword">new</span> ConcreteSubject();</span><br><span class="line"></span><br><span class="line">        <span class="variable">$m_proxy</span> = <span class="keyword">new</span> Proxy(<span class="variable">$m_concrete_subject</span>);</span><br><span class="line">        <span class="variable">$m_proxy</span>-&gt;Request();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Client::main();</span><br><span class="line"></span><br><span class="line"><span class="comment">//Output:</span></span><br><span class="line"><span class="comment">/*</span><br><span class="line">$ php proxy.php</span><br><span class="line">Proxy::Request()</span><br><span class="line">ConcreteSubject::Request()</span><br><span class="line">*/</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Proxy模式最大的好处就是实现了逻辑和实现的彻底解耦。</p>
+</blockquote>
+<h3 id="相关模式">相关模式</h3><ul>
+<li>Adapter模式为了所适配的对象提供了一个不同的接口，而代理模式为对应的实体提供完全相同的接口。然而，用于访问保护的代理可能会拒绝执行某些实体的操作，因此它的接口实际上可能是实体接口的一个子集。</li>
+<li>Decorator模式实现了部分Proxy模式的部分功能，但是两者的侧重点不一样，前者主要是为对象添加一个或多个功能(职责)，而后者则侧重于控制对象的访问。</li>
+</ul>
+<h3 id="参考资料">参考资料</h3><p>设计模式-可复用面向对象软件的基础  GoF<br><a href="http://www.mscenter.edu.cn/blog/k_eckel" target="_blank" rel="external">设计模式精解－GoF 23种设计模式解析</a></p>
+<h3 id="后记">后记</h3><blockquote>
+<p>本文仅为个人学习笔记整理，如有纰漏之处，欢迎指正-:)</p>
+</blockquote>
+<p>—EOF—</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<h3 id="引言">引言</h3><p>本文首先简单介绍代理(Proxy)模式，然后尝试提供一种代理(Proxy)模式的PHP实现示例。</p>
+<h3 id="意图">意图</h3><p>为其他对象提供一种代理，以控制对这个对象的访问。</p>
+<h3 id="适用场景">]]>
+    </summary>
+    
+      <category term="Design Pattern" scheme="http://fengcode.com/tags/Design-Pattern/"/>
+    
+      <category term="PHP" scheme="http://fengcode.com/tags/PHP/"/>
+    
+      <category term="PHP" scheme="http://fengcode.com/categories/PHP/"/>
+    
+      <category term="Design Pattern" scheme="http://fengcode.com/categories/PHP/Design-Pattern/"/>
+    
+  </entry>
   
   <entry>
     <title><![CDATA[PHP设计模式笔记--装饰模式(Decorator)]]></title>

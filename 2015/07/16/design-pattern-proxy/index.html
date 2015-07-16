@@ -22,7 +22,7 @@
 
 
 
-  <meta name="keywords" content="Python," />
+  <meta name="keywords" content="Design Pattern,PHP," />
 
 
 
@@ -47,7 +47,7 @@
 
 
 
-  <title> 记一次问题的解决 // eDeng's Notes </title>
+  <title> PHP设计模式笔记--代理模式(Proxy) // eDeng's Notes </title>
 </head>
 
 <body>
@@ -160,7 +160,7 @@
           
           
             
-              记一次问题的解决
+              PHP设计模式笔记--代理模式(Proxy)
             
           
         </h1>
@@ -168,14 +168,22 @@
 
       <div class="post-meta">
         <span class="post-time">
-          发表于 2015-06-25
+          发表于 2015-07-16
         </span>
 
         
           <span class="post-category">
             &nbsp; | &nbsp; 分类于
             
-              <a href="/categories/Python/">Python</a>
+              <a href="/categories/PHP/">PHP</a>
+
+              
+              
+                ， 
+              
+
+            
+              <a href="/categories/PHP/Design-Pattern/">Design Pattern</a>
 
               
               
@@ -188,8 +196,8 @@
           
             <span class="post-comments-count">
             &nbsp; | &nbsp;
-            <a href="/2015/06/25/hdu-web-auth/#comments" >
-              <span class="post-comments-count ds-thread-count" data-thread-key="2015/06/25/hdu-web-auth/"></span>
+            <a href="/2015/07/16/design-pattern-proxy/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2015/07/16/design-pattern-proxy/"></span>
             </a>
           </span>
           
@@ -203,11 +211,35 @@
       
 
       
-        <h3 id="背景">背景</h3><p>学校要求所有的机子都需要输入学号和密码才能访问外网，导致实验室的一台CentOS服务器也未能幸免。这台CentOS服务器装的是minial版本的，也就是说没有任何可视界面，因此常规的在浏览器里登录自然不行了。</p>
-<h3 id="实施">实施</h3><p>因为有过一点爬虫的基础，于是想当然的想到，写个脚本模拟登录不是就可以了？<br>于是便有了以下这个脚本：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># HDU WebAuth For Centos Without GNOME Desktop</span></span><br><span class="line"><span class="comment"># Copyright 2015 edeng.zheng@gmail.com</span></span><br><span class="line"><span class="comment"># 2015-05-13</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> urllib</span><br><span class="line"><span class="keyword">import</span> urllib2</span><br><span class="line"><span class="keyword">import</span> getpass</span><br><span class="line"></span><br><span class="line"><span class="comment">#request url</span></span><br><span class="line">url = <span class="string">'http://IPAddress/webAuth/index.htm?'</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#get the username and password</span></span><br><span class="line">myusername = raw_input(<span class="string">"Enter your username:"</span>)</span><br><span class="line">mypasswd = getpass.getpass(<span class="string">"Enter your passwd:"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#encode the post data</span></span><br><span class="line">values = &#123;<span class="string">'username'</span>:myusername,<span class="string">'pwd'</span>:mypasswd&#125;</span><br><span class="line">data = urllib.urlencode(values)</span><br><span class="line"></span><br><span class="line"><span class="comment">#post the request</span></span><br><span class="line">req = urllib2.Request(url,data)</span><br><span class="line">response = urllib2.urlopen(req)</span><br><span class="line"></span><br><span class="line"><span class="comment">#get the response page</span></span><br><span class="line">ret_page = response.read()</span><br><span class="line"></span><br><span class="line"><span class="comment">#return succeed or failed</span></span><br><span class="line">flag_success = <span class="string">"var tips="</span></span><br><span class="line">flag_success.decode(<span class="string">'utf8'</span>)</span><br><span class="line">result = ret_page.find(flag_success)</span><br><span class="line"></span><br><span class="line"><span class="comment">#print result;</span></span><br><span class="line"><span class="keyword">if</span> result &gt;= <span class="number">0</span>:</span><br><span class="line">    <span class="keyword">print</span> <span class="string">'Login Success!'</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    <span class="keyword">print</span> <span class="string">'Login Failed!'</span></span><br></pre></td></tr></table></figure></p>
-<p>在借助Python类库的基础上，整个实现起来也很方便；另一方面也可见学校的验证系统并没有对脚本的模拟登录做过多的阻扰和限制；原谅我把登录成功的检测匹配写的这么恶心 = =</p>
-<h3 id="测试">测试</h3><p>登录以后就可以ping通外网了<br><img src="/img/webauth.png" alt="测试"></p>
-<h3 id="后记">后记</h3><p>实验室的小伙伴脑洞打开，如果把用户名和密码固定，然后让脚本在每次开机启动的时候自动运行，不是就不用每次都进行麻烦的手动登录了？嗯，确实是一个好主意！</p>
+        <h3 id="引言">引言</h3><p>本文首先简单介绍代理(Proxy)模式，然后尝试提供一种代理(Proxy)模式的PHP实现示例。</p>
+<h3 id="意图">意图</h3><p>为其他对象提供一种代理，以控制对这个对象的访问。</p>
+<h3 id="适用场景">适用场景</h3><ol>
+<li>保护代理(Protection Proxy) 控制对原始对象的访问</li>
+<li>远程代理(Remote Proxy) 为一个对象在不同的地址空间提供局部代表</li>
+<li>虚代理(Virtual Proxy) 根据需要创建开销很大的对象</li>
+<li>智能指引(Smart Reference) 智能指针的实现，取代简单指针，在访问对象的时候执行一些附加操作</li>
+</ol>
+<hr>
+<p>代理(Proxy)模式在访问对象时引入了一定程度的间接性。根据代理的类型，附加的间接性有多种用途：</p>
+<ul>
+<li>远程代理(Remote Proxy) 可以隐藏一个对象存在于不同地址空间的事实</li>
+<li>虚代理(Virtual Proxy) 可以进行最优化，例如根据要求创建对象</li>
+<li>保护代理(Protection Proxies)和智能指引(Smart Reference)都允许在访问一个对象时有一些附加的内务处理(Housekeeping task)</li>
+</ul>
+<h3 id="结构">结构</h3><p><img src="/img/Proxy.png" alt="Proxy模式结构图"></p>
+<h3 id="代码实现">代码实现</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Subject</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">Request</span><span class="params">()</span></span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//真正执行的类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConcreteSubject</span> <span class="keyword">extends</span> <span class="title">Subject</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">Request</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">"ConcreteSubject::Request()\n"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Proxy</span> <span class="keyword">extends</span> <span class="title">Subject</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">(<span class="variable">$subject</span>)</span></span>&#123;</span><br><span class="line">        <span class="variable">$this</span>-&gt;_subject = <span class="variable">$subject</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//Proxy 接受Request请求，然后调用ConcreteRequest的Request去执行真正的操作</span></span><br><span class="line">    <span class="comment">//这里Proxy在真正调用ConcreteRequest的Request之前，还能够做一些其他的操作，</span></span><br><span class="line">    <span class="comment">//这部分工作也许正是代理的优势的真正体现之处了</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">Request</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">"Proxy::Request()\n"</span>;</span><br><span class="line">        <span class="variable">$this</span>-&gt;_subject-&gt;Request();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> <span class="variable">$_subject</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Client</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="function"><span class="keyword">function</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="variable">$m_concrete_subject</span> = <span class="keyword">new</span> ConcreteSubject();</span><br><span class="line"></span><br><span class="line">        <span class="variable">$m_proxy</span> = <span class="keyword">new</span> Proxy(<span class="variable">$m_concrete_subject</span>);</span><br><span class="line">        <span class="variable">$m_proxy</span>-&gt;Request();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Client::main();</span><br><span class="line"></span><br><span class="line"><span class="comment">//Output:</span></span><br><span class="line"><span class="comment">/*</span><br><span class="line">$ php proxy.php</span><br><span class="line">Proxy::Request()</span><br><span class="line">ConcreteSubject::Request()</span><br><span class="line">*/</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Proxy模式最大的好处就是实现了逻辑和实现的彻底解耦。</p>
+</blockquote>
+<h3 id="相关模式">相关模式</h3><ul>
+<li>Adapter模式为了所适配的对象提供了一个不同的接口，而代理模式为对应的实体提供完全相同的接口。然而，用于访问保护的代理可能会拒绝执行某些实体的操作，因此它的接口实际上可能是实体接口的一个子集。</li>
+<li>Decorator模式实现了部分Proxy模式的部分功能，但是两者的侧重点不一样，前者主要是为对象添加一个或多个功能(职责)，而后者则侧重于控制对象的访问。</li>
+</ul>
+<h3 id="参考资料">参考资料</h3><p>设计模式-可复用面向对象软件的基础  GoF<br><a href="http://www.mscenter.edu.cn/blog/k_eckel" target="_blank" rel="external">设计模式精解－GoF 23种设计模式解析</a></p>
+<h3 id="后记">后记</h3><blockquote>
+<p>本文仅为个人学习笔记整理，如有纰漏之处，欢迎指正-:)</p>
+</blockquote>
+<p>—EOF—</p>
 
       
     </div>
@@ -216,7 +248,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/Python/"> #Python </a>
+            <a href="/tags/Design-Pattern/"> #Design Pattern </a>
+          
+            <a href="/tags/PHP/"> #PHP </a>
           
         </div>
       
@@ -225,13 +259,11 @@
         <div class="post-nav">
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2015/06/30/design-pattern-factory-method/">PHP设计模式笔记--工厂方法(Facroty Method)</a>
-            
           </div>
 
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2015/03/05/big-endian-and-little-endian/">浅谈大端模式和小端模式</a>
+              <a href="/2015/07/15/design-pattern-decorator/">PHP设计模式笔记--装饰模式(Decorator)</a>
             
           </div>
         </div>
@@ -249,8 +281,8 @@
     
       <div class="comments" id="comments">
         
-          <div class="ds-thread" data-thread-key="2015/06/25/hdu-web-auth/"
-               data-title="记一次问题的解决" data-url="http://fengcode.com/2015/06/25/hdu-web-auth/">
+          <div class="ds-thread" data-thread-key="2015/07/16/design-pattern-proxy/"
+               data-title="PHP设计模式笔记--代理模式(Proxy)" data-url="http://fengcode.com/2015/07/16/design-pattern-proxy/">
           </div>
         
       </div>
@@ -354,7 +386,7 @@
           <div class="post-toc">
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实施"><span class="nav-number">2.</span> <span class="nav-text">实施</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#测试"><span class="nav-number">3.</span> <span class="nav-text">测试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#后记"><span class="nav-number">4.</span> <span class="nav-text">后记</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#引言"><span class="nav-number">1.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#意图"><span class="nav-number">2.</span> <span class="nav-text">意图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#适用场景"><span class="nav-number">3.</span> <span class="nav-text">适用场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#结构"><span class="nav-number">4.</span> <span class="nav-text">结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代码实现"><span class="nav-number">5.</span> <span class="nav-text">代码实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#相关模式"><span class="nav-number">6.</span> <span class="nav-text">相关模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">7.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#后记"><span class="nav-number">8.</span> <span class="nav-text">后记</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>
