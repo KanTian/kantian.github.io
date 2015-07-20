@@ -5,7 +5,7 @@
   <subtitle><![CDATA[技术是一场修行...]]></subtitle>
   <link href="/atom.xml" rel="self"/>
   <link href="http://fengcode.com//"/>
-  <updated>2015-07-17T03:23:51.270Z</updated>
+  <updated>2015-07-20T03:39:40.709Z</updated>
   <id>http://fengcode.com//</id>
   
   <author>
@@ -14,6 +14,53 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title><![CDATA[PHP设计模式笔记--职责链模式(Chain Of Responsibility)]]></title>
+    <link href="http://fengcode.com/2015/07/18/design-pattern-command/"/>
+    <id>http://fengcode.com/2015/07/18/design-pattern-command/</id>
+    <published>2015-07-18T05:48:46.000Z</published>
+    <updated>2015-07-20T03:39:40.709Z</updated>
+    <content type="html"><![CDATA[<h3 id="引言">引言</h3><p>本文首先简单介绍命令(Command)模式，然后尝试提供一种命令(Command)模式的PHP实现示例。</p>
+<h3 id="意图">意图</h3><p>将一个请求封装为一个对象，从而使你可用不同的请求对客户进行参数化;对请求排队或记录请求日志，以及支持可撤销的操作。</p>
+<h3 id="适用场景">适用场景</h3><ol>
+<li>需要抽象出某个待执行的动作以参数化某个对象。如同回调函数机制一样，现在某处注册，然后在稍后某个需要的时候被调用。Command模式是回调机制的一个面向对象的替代品</li>
+<li>需要在不同的时刻指定、排列和执行请求</li>
+<li>需要支持撤销之前的操作</li>
+<li>需要记录所有的操作日志，以便对系统操作进行回滚</li>
+<li>需要提供对事务的支持</li>
+</ol>
+<h3 id="结构">结构</h3><p><img src="/img/command.png" alt="Command模式结构图"></p>
+<h3 id="协作">协作</h3><p><img src="/img/command_2.png" alt="Command模式协作图"></p>
+<blockquote>
+<p>如下代码实现提供了该模式的一种简单实现</p>
+</blockquote>
+<h3 id="代码实现">代码实现</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"><span class="comment">//将请求封装成Command对象(ConcreteCommand)，该对象里面保存了该请求的处理者(Receiver)</span></span><br><span class="line"><span class="comment">//由Invoker来激活这个请求的处理过程,在处理的过程中会调用Receiver中的处理函数</span></span><br><span class="line"><span class="comment">//这里有回调意思：先预先设置处理对象，在合适的时候，激活调用该对象中的方法</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Command</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">Excute</span><span class="params">()</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//ConcreteCommand 保存了请求的接收者的对象</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConcreteCommand</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">(<span class="variable">$rev</span>)</span></span>&#123;</span><br><span class="line">        <span class="variable">$this</span>-&gt;_rev = <span class="variable">$rev</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">Excute</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="variable">$this</span>-&gt;_rev-&gt;Action();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">private</span> <span class="variable">$_rev</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//请求的最终接受和处理者</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Receiver</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">Action</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">"Reciever::Action\n"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//当请求到来时，Invoker发出Invoke消息，激活Command对象</span></span><br><span class="line"><span class="comment">//ConcreteCommand再进而将处理请求交的任务给Receiver对象进行处理</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Invoker</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">(<span class="variable">$cmd</span>)</span></span>&#123;</span><br><span class="line">        <span class="variable">$this</span>-&gt;_cmd = <span class="variable">$cmd</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">Invoke</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="variable">$this</span>-&gt;_cmd-&gt;Excute();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="variable">$_cmd</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Client</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="function"><span class="keyword">function</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="variable">$m_receiver</span> = <span class="keyword">new</span> Receiver();</span><br><span class="line">        <span class="comment">//创建ConcreteCommand对象，并且指定它的Receiver对象</span></span><br><span class="line">        <span class="variable">$m_command</span> = <span class="keyword">new</span> ConcreteCommand(<span class="variable">$m_receiver</span>);</span><br><span class="line">        <span class="comment">//Invoker对象存储该ConcreteCommand对象</span></span><br><span class="line">        <span class="variable">$m_invoker</span> = <span class="keyword">new</span> Invoker(<span class="variable">$m_command</span>);</span><br><span class="line">        <span class="comment">//Invoker通过调用Command对象的Execute操作来提交一个请求，如果该命令是可撤销的，</span></span><br><span class="line">        <span class="comment">//ConcreteCommand就在执行Execute操作之前存储当前状态，以用户取消该命令</span></span><br><span class="line">        <span class="variable">$m_invoker</span>-&gt;Invoke();<span class="comment">//ConcreteCommand对象调用它的Receiver的一些操作以执行该请求</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Client::main();</span><br><span class="line"></span><br><span class="line"><span class="comment">//Output</span></span><br><span class="line"><span class="comment">/*</span><br><span class="line">$ php command.php</span><br><span class="line">Reciever::Action</span><br><span class="line">*/</span></span><br></pre></td></tr></table></figure>
+<h3 id="相关模式">相关模式</h3><ul>
+<li>Command 模式将调用操作的对象和具体执行该操作的对象进行了解耦。</li>
+<li>Command 模式通过继承自Command类产生子类ConcreteCommand的方式，可以很快的创建新的操作对象</li>
+<li>Command 模式跟Memento模式结合起来，支持取消操作。</li>
+</ul>
+<h3 id="参考资料">参考资料</h3><p>设计模式-可复用面向对象软件的基础  GoF<br><a href="http://www.mscenter.edu.cn/blog/k_eckel" target="_blank" rel="external">设计模式精解－GoF 23种设计模式解析</a></p>
+<h3 id="后记">后记</h3><blockquote>
+<p>本文仅为个人学习笔记整理，如有纰漏之处，欢迎指正-:)</p>
+</blockquote>
+<p>—EOF—</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<h3 id="引言">引言</h3><p>本文首先简单介绍命令(Command)模式，然后尝试提供一种命令(Command)模式的PHP实现示例。</p>
+<h3 id="意图">意图</h3><p>将一个请求封装为一个对象，从而使你可用不同的请求对客户进行参数化;对请求排队或]]>
+    </summary>
+    
+      <category term="Design Pattern" scheme="http://fengcode.com/tags/Design-Pattern/"/>
+    
+      <category term="PHP" scheme="http://fengcode.com/tags/PHP/"/>
+    
+      <category term="PHP" scheme="http://fengcode.com/categories/PHP/"/>
+    
+      <category term="Design Pattern" scheme="http://fengcode.com/categories/PHP/Design-Pattern/"/>
+    
+  </entry>
   
   <entry>
     <title><![CDATA[PHP设计模式笔记--职责链模式(Chain Of Responsibility)]]></title>
