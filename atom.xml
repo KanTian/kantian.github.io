@@ -5,7 +5,7 @@
   <subtitle><![CDATA[技术是一场修行...]]></subtitle>
   <link href="/atom.xml" rel="self"/>
   <link href="http://fengcode.com//"/>
-  <updated>2015-07-20T03:39:40.709Z</updated>
+  <updated>2015-07-20T03:41:23.335Z</updated>
   <id>http://fengcode.com//</id>
   
   <author>
@@ -16,11 +16,11 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
-    <title><![CDATA[PHP设计模式笔记--职责链模式(Chain Of Responsibility)]]></title>
-    <link href="http://fengcode.com/2015/07/18/design-pattern-command/"/>
-    <id>http://fengcode.com/2015/07/18/design-pattern-command/</id>
-    <published>2015-07-18T05:48:46.000Z</published>
-    <updated>2015-07-20T03:39:40.709Z</updated>
+    <title><![CDATA[PHP设计模式笔记--命令模式(Command)]]></title>
+    <link href="http://fengcode.com/2015/07/19/design-pattern-command/"/>
+    <id>http://fengcode.com/2015/07/19/design-pattern-command/</id>
+    <published>2015-07-19T05:48:46.000Z</published>
+    <updated>2015-07-20T03:41:23.335Z</updated>
     <content type="html"><![CDATA[<h3 id="引言">引言</h3><p>本文首先简单介绍命令(Command)模式，然后尝试提供一种命令(Command)模式的PHP实现示例。</p>
 <h3 id="意图">意图</h3><p>将一个请求封装为一个对象，从而使你可用不同的请求对客户进行参数化;对请求排队或记录请求日志，以及支持可撤销的操作。</p>
 <h3 id="适用场景">适用场景</h3><ol>
